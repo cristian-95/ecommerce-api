@@ -3,14 +3,15 @@ package com.commerce.api.model;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import com.commerce.api.model.dto.ProdutoDTO;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Produto implements Serializable{
-
+public class Produto implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -18,20 +19,29 @@ public class Produto implements Serializable{
     private String nome;
     private String descricao;
     private HashMap<String, String> specs;
-    private Double price;
+    private Double preco;
     private Long qtdeEstoque;
 
-  
-    public Produto(Long id, String nome, HashMap<String, String> specs, Double price, Long qtdeEstoque, String descricao) {
+    public Produto() {
+    }
+
+    public Produto(Long id, String nome, HashMap<String, String> specs, Double preco, Long qtdeEstoque,
+            String descricao) {
         this.id = id;
         this.nome = nome;
         this.specs = specs;
         this.descricao = descricao;
-        this.price = price;
+        this.preco = preco;
         this.qtdeEstoque = qtdeEstoque;
     }
 
-    public Produto() {
+    public Produto(ProdutoDTO dto) {
+        this.id = dto.id();
+        this.nome = dto.nome();
+        this.specs = dto.specs();
+        this.descricao = dto.descricao();
+        this.preco = dto.preco();
+        this.qtdeEstoque = dto.qtdeEstoque();
     }
 
     public Long getId() {
@@ -66,12 +76,12 @@ public class Produto implements Serializable{
         this.specs = specs;
     }
 
-    public Double getPrice() {
-        return price;
+    public Double getPreco() {
+        return preco;
     }
 
-    public void setPrice(Double price) {
-        this.price = price;
+    public void setPreco(Double preco) {
+        this.preco = preco;
     }
 
     public Long getQtdeEstoque() {
@@ -90,7 +100,7 @@ public class Produto implements Serializable{
         result = prime * result + ((nome == null) ? 0 : nome.hashCode());
         result = prime * result + ((descricao == null) ? 0 : descricao.hashCode());
         result = prime * result + ((specs == null) ? 0 : specs.hashCode());
-        result = prime * result + ((price == null) ? 0 : price.hashCode());
+        result = prime * result + ((preco == null) ? 0 : preco.hashCode());
         result = prime * result + ((qtdeEstoque == null) ? 0 : qtdeEstoque.hashCode());
         return result;
     }
@@ -124,10 +134,10 @@ public class Produto implements Serializable{
                 return false;
         } else if (!specs.equals(other.specs))
             return false;
-        if (price == null) {
-            if (other.price != null)
+        if (preco == null) {
+            if (other.preco != null)
                 return false;
-        } else if (!price.equals(other.price))
+        } else if (!preco.equals(other.preco))
             return false;
         if (qtdeEstoque == null) {
             if (other.qtdeEstoque != null)
@@ -136,12 +146,4 @@ public class Produto implements Serializable{
             return false;
         return true;
     }
-
-    @Override
-    public String toString() {
-        return "Produto [id=" + id + ", nome=" + nome + ", descricao=" + descricao + ", specs=" + specs + ", price="
-                + price + ", qtdeEstoque=" + qtdeEstoque + "]";
-    }
-
-    
 }

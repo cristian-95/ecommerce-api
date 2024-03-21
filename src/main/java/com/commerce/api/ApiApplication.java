@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @SpringBootApplication
 @EntityScan(basePackages = {"com.commerce.api.model"})
 @ComponentScan(basePackages = {"com.*"})
-@EnableJpaRepositories(basePackages = {"com.commerce-api.repository"})
+@EnableJpaRepositories(basePackages = {"com.commerce.api.repository"})
 @EnableTransactionManagement
 @EnableWebMvc
 @RestController
