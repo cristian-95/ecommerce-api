@@ -2,6 +2,7 @@ package com.commerce.api.model;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 
 import com.commerce.api.model.dto.ProdutoDTO;
 
@@ -9,8 +10,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "produtos")
 public class Produto implements Serializable {
 
     @Id
@@ -21,6 +25,8 @@ public class Produto implements Serializable {
     private HashMap<String, String> specs;
     private Double preco;
     private Long qtdeEstoque;
+    @ManyToMany(mappedBy = "favoritos")    
+    private List<Usuario> usuarios;
 
     public Produto() {
     }
