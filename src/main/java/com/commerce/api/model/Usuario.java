@@ -1,9 +1,14 @@
 package com.commerce.api.model;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.commerce.api.model.dto.UsuarioDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,41 +20,79 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
-
 @Entity
-@Table(name= "usuarios")
-public class Usuario implements Serializable {
+@Table(name = "usuarios")
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(nullable = false, unique = true)    
+    @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
     private String password;
-    @Column(nullable = false)
     private String nome;
-    @Column(nullable = false)
     private String sobrenome;
-    @Column(nullable = false)
     private String documento;
-    @Column(nullable = false)
     private String email;
     private String endereco;
     private LocalDate dataNasc;
     private String genero;
     @ManyToMany
-    @JoinTable(name = "favoritos",
-        joinColumns = @JoinColumn(name = "usuarios_id"),
-        inverseJoinColumns = @JoinColumn(name = "produtos_id"))
+    @JoinTable(name = "favoritos", joinColumns = @JoinColumn(name = "usuarios_id"), inverseJoinColumns = @JoinColumn(name = "produtos_id"))
     private List<Produto> favoritos;
+
+    private UserRole role;
+    private Boolean enabled;
+    private Boolean accountNonLocked;
+    private Boolean accountNonExpired;
+    private Boolean credentialsNonExpired;
 
     public Usuario() {
         this.favoritos = new ArrayList<>();
+        setAccountInitialProperties();
     }
 
+    public Usuario(String username, String password, UserRole role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.favoritos = new ArrayList<>();
+        setAccountInitialProperties();
+    }
+
+    public Usuario(String username, String encriptedPassword, String role) {
+        this.username = username;
+        this.password = encriptedPassword;
+        this.role = UserRole.valueOf(role.toUpperCase());
+        this.favoritos = new ArrayList<>();
+        setAccountInitialProperties();
+    }
+
+    // public Usuario(Long id, String username, String password, String nome, String
+    // sobrenome, String documento,
+    // String email, String endereco, LocalDate dataNasc, String genero,
+    // List<Produto> favoritos) {
+    // this.id = id;
+    // this.username = username;
+    // this.password = password;
+    // this.nome = nome;
+    // this.sobrenome = sobrenome;
+    // this.documento = documento;
+    // this.email = email;
+    // this.endereco = endereco;
+    // this.dataNasc = dataNasc;
+    // this.genero = genero;
+    // this.favoritos = favoritos;
+    // this.enabled = true;
+    // this.accountNonLocked = true;
+    // this.accountNonExpired = true;
+    // this.credentialsNonExpired = true;
+    // }
+
     public Usuario(Long id, String username, String password, String nome, String sobrenome, String documento,
-            String email, String endereco, LocalDate dataNasc, String genero, List<Produto> favoritos) {
+            String email, String endereco, LocalDate dataNasc, String genero, List<Produto> favoritos, UserRole role,
+            Boolean enabled, Boolean accountNonLocked, Boolean accountNonExpired, Boolean credentialsNonExpired) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -61,6 +104,11 @@ public class Usuario implements Serializable {
         this.dataNasc = dataNasc;
         this.genero = genero;
         this.favoritos = favoritos;
+        this.role = role;
+        this.enabled = enabled;
+        this.accountNonLocked = accountNonLocked;
+        this.accountNonExpired = accountNonExpired;
+        this.credentialsNonExpired = credentialsNonExpired;
     }
 
     public Usuario(UsuarioDTO dto) {
@@ -75,17 +123,19 @@ public class Usuario implements Serializable {
         this.dataNasc = dto.dataNasc();
         this.genero = dto.genero();
         this.favoritos = new ArrayList<>();
+        this.role = UserRole.valueOf(dto.role().toUpperCase());
+        setAccountInitialProperties();
     }
 
-    public void addFavorito(Produto produto){
-        if (!this.favoritos.contains(produto)){
-        this.favoritos.add(produto);
+    public void addFavorito(Produto produto) {
+        if (!this.favoritos.contains(produto)) {
+            this.favoritos.add(produto);
         }
     }
 
-    public void removeFavorito(Produto produto){
-        if (!this.favoritos.contains(produto)){
-            this.favoritos.remove(produto);            
+    public void removeFavorito(Produto produto) {
+        if (!this.favoritos.contains(produto)) {
+            this.favoritos.remove(produto);
         }
     }
 
@@ -178,6 +228,48 @@ public class Usuario implements Serializable {
     }
 
     @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return switch (this.getRole()) {
+            case "manager" -> List.of(
+                    new SimpleGrantedAuthority("ROLE_USER"),
+                    new SimpleGrantedAuthority("ROLE_MANAGER"));
+            case "admin" -> List.of(
+                    new SimpleGrantedAuthority("ROLE_USER"),
+                    new SimpleGrantedAuthority("ROLE_MANAGER"),
+                    new SimpleGrantedAuthority("ROLE_ADMIN"));
+            default -> List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        };
+    }
+
+    public String getRole() {
+        return role.getRole();
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return this.accountNonExpired;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return this.accountNonLocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return this.credentialsNonExpired;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -192,6 +284,11 @@ public class Usuario implements Serializable {
         result = prime * result + ((dataNasc == null) ? 0 : dataNasc.hashCode());
         result = prime * result + ((genero == null) ? 0 : genero.hashCode());
         result = prime * result + ((favoritos == null) ? 0 : favoritos.hashCode());
+        result = prime * result + ((role == null) ? 0 : role.hashCode());
+        result = prime * result + ((enabled == null) ? 0 : enabled.hashCode());
+        result = prime * result + ((accountNonLocked == null) ? 0 : accountNonLocked.hashCode());
+        result = prime * result + ((accountNonExpired == null) ? 0 : accountNonExpired.hashCode());
+        result = prime * result + ((credentialsNonExpired == null) ? 0 : credentialsNonExpired.hashCode());
         return result;
     }
 
@@ -259,7 +356,35 @@ public class Usuario implements Serializable {
                 return false;
         } else if (!favoritos.equals(other.favoritos))
             return false;
+        if (role != other.role)
+            return false;
+        if (enabled == null) {
+            if (other.enabled != null)
+                return false;
+        } else if (!enabled.equals(other.enabled))
+            return false;
+        if (accountNonLocked == null) {
+            if (other.accountNonLocked != null)
+                return false;
+        } else if (!accountNonLocked.equals(other.accountNonLocked))
+            return false;
+        if (accountNonExpired == null) {
+            if (other.accountNonExpired != null)
+                return false;
+        } else if (!accountNonExpired.equals(other.accountNonExpired))
+            return false;
+        if (credentialsNonExpired == null) {
+            if (other.credentialsNonExpired != null)
+                return false;
+        } else if (!credentialsNonExpired.equals(other.credentialsNonExpired))
+            return false;
         return true;
     }
 
+    private void setAccountInitialProperties() {
+        this.enabled = true;
+        this.accountNonLocked = true;
+        this.accountNonExpired = true;
+        this.credentialsNonExpired = true;
+    }
 }

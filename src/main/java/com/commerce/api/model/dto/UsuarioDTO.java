@@ -12,5 +12,6 @@ public record UsuarioDTO(
         String email,
         String endereco,
         LocalDate dataNasc,
-        String genero
+        String genero,
+        String role
 ){}
