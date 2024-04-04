@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ProdutoDTO;
 import com.commerce.api.service.ProdutoService;
@@ -32,7 +33,7 @@ public class ProdutoController {
     }
 
     @GetMapping(value = "/{id}", produces =  MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable("id")Long id){
+    public ResponseEntity<?> getById(@PathVariable("id")Long id) throws ResourceNotFoundException{
         Produto  produto = service.getProdutoById(id);
         if (produto == null) return new ResponseEntity<>("Produto não encontrado.", HttpStatus.NOT_FOUND);
         return ResponseEntity.ok(produto);
@@ -44,7 +45,7 @@ public class ProdutoController {
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Produto> update(@RequestBody ProdutoDTO dto){
+    public ResponseEntity<Produto> update(@RequestBody ProdutoDTO dto) throws ResourceNotFoundException{
         return ResponseEntity.ok(service.updateProduto(dto));
     }
 

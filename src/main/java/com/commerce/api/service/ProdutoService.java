@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ProdutoDTO;
 import com.commerce.api.repository.ProdutoRepository;
@@ -18,12 +19,12 @@ public class ProdutoService {
         return repository.findAll();
     }
 
-    public Produto getProdutoById(Long id) {
+    public Produto getProdutoById(Long id) throws ResourceNotFoundException {
         try {
             Produto produto = repository.findById(id).get();
             return produto;
         } catch (Exception e) {
-            return null;
+            throw new ResourceNotFoundException("Produto (id = %d) não encontrado".formatted(id));
         }
     }
 
@@ -32,7 +33,7 @@ public class ProdutoService {
         return repository.save(produto);
     }
 
-    public Produto updateProduto(ProdutoDTO dto) {
+    public Produto updateProduto(ProdutoDTO dto) throws ResourceNotFoundException {
         Produto produto = getProdutoById(dto.id());
 
         produto.setNome(dto.nome() != null ? dto.nome() : produto.getNome());
@@ -49,7 +50,7 @@ public class ProdutoService {
             Produto produto = repository.findById(id).get();
             repository.delete(produto);
         } catch (Exception e) {
-            System.err.println("DELETE: Produto: %d não encontrado".formatted(id));;
+            throw new ResourceNotFoundException("Produto (id = %d) não encontrado".formatted(id));
         }
     }
 }

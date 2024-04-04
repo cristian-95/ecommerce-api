@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.Usuario;
 import com.commerce.api.model.dto.UsuarioDTO;
@@ -62,13 +63,13 @@ public class UsuarioController {
 
     @PostMapping(value = "/{user_id}/favoritos",
     produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Produto> addFavorito(@PathVariable("user_id")Long userId, @RequestBody Long produtoId){
+    public ResponseEntity<Produto> addFavorito(@PathVariable("user_id")Long userId, @RequestBody Long produtoId) throws ResourceNotFoundException{
         return ResponseEntity.ok(service.addFavorito(userId,produtoId));
     }
 
     @DeleteMapping(value = "/{user_id}/favoritos",
     produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Produto> removeFavorito(@PathVariable("user_id")Long userId, @RequestBody Long produtoId){
+    public ResponseEntity<Produto> removeFavorito(@PathVariable("user_id")Long userId, @RequestBody Long produtoId) throws ResourceNotFoundException{
         return ResponseEntity.ok(service.removeFavorito(userId,produtoId));
     }
 }
