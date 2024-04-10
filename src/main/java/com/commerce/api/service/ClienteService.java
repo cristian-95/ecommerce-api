@@ -57,7 +57,7 @@ public class ClienteService {
     public Produto addFavorito(Long clienteId, Long produtoId) throws ResourceNotFoundException {
         Cliente cliente = getClienteById(clienteId);
         Produto produto = produtoService.getProdutoById(produtoId);
-        cliente.addFavorito(produto);
+        cliente.adicionarFavorito(produto);
         repository.save(cliente);
         return produto;
     }
@@ -65,7 +65,7 @@ public class ClienteService {
     public Produto removeFavorito(Long clienteId, Long produtoId) throws ResourceNotFoundException {
         Cliente cliente = getClienteById(clienteId);
         Produto produto = produtoService.getProdutoById(produtoId);
-        cliente.removeFavorito(produto);
+        cliente.removerFavorito(produto);
         repository.save(cliente);
         return produto;
     }

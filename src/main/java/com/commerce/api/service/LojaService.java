@@ -59,7 +59,7 @@ public class LojaService {
         Produto produto = produtoService.getProdutoById(produtoId);
         
         produto.setLoja(loja);
-        loja.addProduto(produto);
+        loja.adicionarProduto(produto);
         
         produtoService.updateProduto(produto);
         repository.save(loja);
@@ -71,7 +71,7 @@ public class LojaService {
         Produto produto = produtoService.getProdutoById(produtoId);
         
         produto.setLoja(null);
-        loja.removeProduto(produto);
+        loja.removerProduto(produto);
         
         produtoService.updateProduto(produto);
         repository.save(loja);

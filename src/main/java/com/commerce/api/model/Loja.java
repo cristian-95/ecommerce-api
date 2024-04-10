@@ -47,13 +47,13 @@ public class Loja extends Usuario {
         return this.produtos;
     }
 
-    public void addProduto(Produto produto) {
+    public void adicionarProduto(Produto produto) {
         if (!this.produtos.contains(produto)) {
             this.produtos.add(produto);
         }
     }
 
-    public void removeProduto(Produto produto) {
+    public void removerProduto(Produto produto) {
         if (!this.produtos.contains(produto)) {
             this.produtos.remove(produto);
         }

@@ -39,13 +39,13 @@ public class Cliente extends Usuario {
         this.favoritos = new ArrayList<>();
     }
 
-    public void addFavorito(Produto produto) {
+    public void adicionarFavorito(Produto produto) {
         if (!this.favoritos.contains(produto)) {
             this.favoritos.add(produto);
         }
     }
 
-    public void removeFavorito(Produto produto) {
+    public void removerFavorito(Produto produto) {
         if (!this.favoritos.contains(produto)) {
             this.favoritos.remove(produto);
         }
