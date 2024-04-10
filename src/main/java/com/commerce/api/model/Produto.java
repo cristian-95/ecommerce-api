@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.commerce.api.model.dto.ProdutoDTO;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,7 +29,12 @@ public class Produto implements Serializable {
     private Double preco;
     private Long qtdeEstoque;
     @ManyToMany(mappedBy = "favoritos")    
-    private List<Usuario> usuarios;
+    private List<Cliente> clientes;
+    @ManyToOne
+    @JoinColumn(name="loja_id")
+    @JsonBackReference
+    private Loja loja;
+
 
     public Produto() {
     }
@@ -98,6 +106,24 @@ public class Produto implements Serializable {
         this.qtdeEstoque = qtdeEstoque;
     }
 
+    public List<Cliente> getClientes() {
+        return clientes;
+    }
+
+    public void setClientes(List<Cliente> clientes) {
+        this.clientes = clientes;
+    }
+
+    public Loja getLoja() {
+        return loja;
+    }
+
+    public void setLoja(Loja loja) {
+        this.loja = loja;
+    }
+
+    
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -152,4 +178,6 @@ public class Produto implements Serializable {
             return false;
         return true;
     }
+
+    
 }

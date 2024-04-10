@@ -18,58 +18,61 @@ import org.springframework.web.bind.annotation.RestController;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.Usuario;
-import com.commerce.api.model.dto.UsuarioDTO;
-import com.commerce.api.service.UsuarioService;
+import com.commerce.api.model.Loja;
+import com.commerce.api.model.dto.LojaDTO;
+import com.commerce.api.service.LojaService;
 
 @RestController
-@RequestMapping("/usuarios")
-public class UsuarioController {
+@RequestMapping("/lojas")
+public class LojaController {
 
     @Autowired
-    private UsuarioService service;
+    private LojaService service;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Usuario>> getAll(){
-        return ResponseEntity.ok(service.getAllUsuarios());        
+        return ResponseEntity.ok(service.getAllLojas());        
     }
 
     @GetMapping(value = "/{id}", produces =  MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable("id")Long id){
-        Usuario  usuario = service.getUsuarioById(id);
-        if (usuario == null) return new ResponseEntity<>("Usuario não encontrado.", HttpStatus.NOT_FOUND);
+        Loja  usuario = service.getLojaById(id);
+        if (usuario == null) return new ResponseEntity<>("Loja não encontrado.", HttpStatus.NOT_FOUND);
         return ResponseEntity.ok(usuario);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Usuario> create(@RequestBody UsuarioDTO dto){
-        return new ResponseEntity<Usuario>(service.createUsuario(dto), HttpStatus.CREATED);
+    public ResponseEntity<Loja> create(@RequestBody LojaDTO dto){
+        return new ResponseEntity<Loja>(service.createLoja(dto), HttpStatus.CREATED);
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Usuario> update(@RequestBody UsuarioDTO dto){
-        return ResponseEntity.ok(service.updateUsuario(dto));
+    public ResponseEntity<Loja> update(@RequestBody LojaDTO dto){
+        return ResponseEntity.ok(service.updateLoja(dto));
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> delete(@PathVariable("id")Long id) throws Exception{
-        service.deleteUsuario(id);
+        service.deleteLoja(id);
         return ResponseEntity.noContent().build();        
     }
 
-    @GetMapping(value = "/{user_id}/favoritos", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Produto>> getAllFavoritos(@PathVariable("user_id")Long userId){
-        return ResponseEntity.ok(service.getAllFavoritos(userId));
+    @GetMapping(value = "/{id}/produtos", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Produto>> getAllProdutos(@PathVariable("id")Long lojaID){
+        return ResponseEntity.ok(service.getAllProdutos(lojaID));
     }
 
-    @PostMapping(value = "/{user_id}/favoritos",
+    @PostMapping(value = "/{id}/produtos",
     produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Produto> addFavorito(@PathVariable("user_id")Long userId, @RequestBody Long produtoId) throws ResourceNotFoundException{
-        return ResponseEntity.ok(service.addFavorito(userId,produtoId));
+    public ResponseEntity<?> addProduto(@PathVariable("id")Long lojaID, @RequestBody Long produtoId) throws ResourceNotFoundException{
+        service.addProduto(lojaID,produtoId);
+        return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(value = "/{user_id}/favoritos",
+    @DeleteMapping(value = "/{id}/produtos",
     produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Produto> removeFavorito(@PathVariable("user_id")Long userId, @RequestBody Long produtoId) throws ResourceNotFoundException{
-        return ResponseEntity.ok(service.removeFavorito(userId,produtoId));
+    public ResponseEntity<?> removeProduto(@PathVariable("id")Long lojaID, @RequestBody Long produtoId) throws ResourceNotFoundException{
+        service.removeProduto(lojaID,produtoId);
+        return ResponseEntity.ok().build();
     }
 }

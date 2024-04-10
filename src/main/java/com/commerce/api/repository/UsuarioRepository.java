@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.commerce.api.model.Usuario;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+public interface UsuarioRepository<T extends Usuario> extends JpaRepository<Usuario, Long> {
 }

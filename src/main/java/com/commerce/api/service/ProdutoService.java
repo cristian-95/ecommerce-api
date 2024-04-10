@@ -1,17 +1,20 @@
 package com.commerce.api.service;
 
 import java.util.List;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.commerce.api.exception.ResourceNotFoundException;
+
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ProdutoDTO;
 import com.commerce.api.repository.ProdutoRepository;
 
 @Service
 public class ProdutoService {
-    
+
     @Autowired
     private ProdutoRepository repository;
 
@@ -35,17 +38,17 @@ public class ProdutoService {
 
     public Produto updateProduto(ProdutoDTO dto) throws ResourceNotFoundException {
         Produto produto = getProdutoById(dto.id());
-
-        produto.setNome(dto.nome() != null ? dto.nome() : produto.getNome());
-        produto.setDescricao(dto.descricao() != null ? dto.descricao() : produto.getDescricao());
-        produto.setPreco(dto.preco() != null ? dto.preco() : produto.getPreco());
-        produto.setSpecs(dto.specs() != null ? dto.specs() : produto.getSpecs());
-        produto.setQtdeEstoque(dto.qtdeEstoque() != null ? dto.qtdeEstoque() : produto.getQtdeEstoque());
-
+        produto = update(dto, produto);
         return repository.save(produto);
     }
 
-    public void deleteProduto(Long id) throws Exception {        
+    public void updateProduto(Produto updatedProduto) throws ResourceNotFoundException {
+        Produto produto = getProdutoById(updatedProduto.getId());
+        BeanUtils.copyProperties(updatedProduto, produto);
+        repository.save(produto);
+    }
+
+    public void deleteProduto(Long id) throws Exception {
         try {
             Produto produto = repository.findById(id).get();
             repository.delete(produto);
@@ -53,4 +56,14 @@ public class ProdutoService {
             throw new ResourceNotFoundException("Produto (id = %d) não encontrado".formatted(id));
         }
     }
+
+    private Produto update(ProdutoDTO dto, Produto produto) {
+        produto.setNome(dto.nome() != null ? dto.nome() : produto.getNome());
+        produto.setDescricao(dto.descricao() != null ? dto.descricao() : produto.getDescricao());
+        produto.setPreco(dto.preco() != null ? dto.preco() : produto.getPreco());
+        produto.setSpecs(dto.specs() != null ? dto.specs() : produto.getSpecs());
+        produto.setQtdeEstoque(dto.qtdeEstoque() != null ? dto.qtdeEstoque() : produto.getQtdeEstoque());
+        return produto;
+    }
+
 }
