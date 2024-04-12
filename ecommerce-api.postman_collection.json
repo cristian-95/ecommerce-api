@@ -33,29 +33,6 @@
 					"response": []
 				},
 				{
-					"name": "GET ALL Copy",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/produtos",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"produtos"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "GET BY ID",
 					"request": {
 						"method": "GET",
@@ -92,7 +69,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"nome\": \"Smart TV Samsung QLED QN90B Neo QLED 8K\",\n    \"descricao\": \"Smart TV de última geração com tela QLED 8K de alta resolução, processador Neo QLED 8K e recursos de inteligência artificial avançados.\",\n    \"specs\": {\n        \"brand\": \"Samsung\",\n        \"model\": \"QN90B Neo QLED 8K\",\n        \"screen_size_inches\": \"83\",\n        \"resolution\": \"7680 x 4320 pixels\",\n        \"panel_type\": \"QLED\",\n        \"processor\": \"Neo QLED 8K\"        \n    },\n    \"preco\": 2598.00,\n    \"qtdeEstoque\": 75\n}",
+							"raw": "{\n    \"nome\": \"\",\n    \"descricao\": \"\",\n    \"specs\": {\n        \"brand\": \"\",\n        \"model\": \"\",        \n        \"\": \"\"        \n    },\n    \"preco\": 0,\n    \"qtdeEstoque\": 0\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -124,7 +101,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 157,\n    \"nome\": \"Fone philips FPH3000\",   \n    \"qtdeEstoque\": 1500\n}",
+							"raw": "{\n    \"id\":\"\",\n    \"nome\": \"\",\n    \"descricao\": \"\",\n    \"specs\": {\n        \"brand\": \"\",\n        \"model\": \"\",        \n        \"\": \"\"        \n    },\n    \"preco\": 0,\n    \"qtdeEstoque\": 0\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -177,7 +154,7 @@
 			]
 		},
 		{
-			"name": "usuario",
+			"name": "clientes",
 			"item": [
 				{
 					"name": "favoritos",
@@ -232,7 +209,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "1",
+									"raw": "53",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -240,12 +217,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{base_url}}/usuarios/102/favoritos",
+									"raw": "{{base_url}}/clientes/102/favoritos",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
-										"usuarios",
+										"clientes",
 										"102",
 										"favoritos"
 									]
@@ -301,12 +278,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/usuarios",
+							"raw": "{{base_url}}/clientes",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"usuarios"
+								"clientes"
 							]
 						}
 					},
@@ -324,13 +301,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/usuarios/1",
+							"raw": "{{base_url}}/clientes/102",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"usuarios",
-								"1"
+								"clientes",
+								"102"
 							]
 						}
 					},
@@ -349,7 +326,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"paula-991\",\n    \"password\": \"abc321\",\n    \"role\": \"user\",\n    \"nome\": \"Paula\",\n    \"sobrenome\": \"Silva\",\n    \"documento\": \"9876554321\",\n    \"email\": \"paulinha@mail.com\"\n}\n",
+							"raw": "{\n    \"username\": \"\",\n    \"password\": \"\",    \n    \"nome\": \"\",\n    \"sobrenome\": \"\",\n    \"dataNasc\": \"\",\n    \"CPF\": \"\",\n    \"email\": \"\",\n    \"telefone\": \"\" ,\n    \"genero\": \"\",\n    \"endereco\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -357,12 +334,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/usuarios",
+							"raw": "{{base_url}}/clientes",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"usuarios"
+								"clientes"
 							]
 						}
 					},
@@ -381,7 +358,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 52,   \n    \n    \"nome\": null,\n    \"sobrenome\": null,\n    \"documento\": null,\n    \"email\": null,\n    \"endereco\": null,\n    \"dataNasc\": null,\n    \"genero\": null,\n    \"favoritos\": [],\n    \"role\": \"admin\",\n    \"enabled\": true,\n    \"accountNonLocked\": true,\n    \"accountNonExpired\": true,\n    \"credentialsNonExpired\": true\n}",
+							"raw": "{\n    \"id\": \"\",    \n    \"password\": \"\",    \n    \"nome\": \"\",\n    \"sobrenome\": \"\",\n    \"dataNasc\": \"\",\n    \"CPF\": \"\",\n    \"email\": \"\",\n    \"telefone\": \"\" ,\n    \"genero\": \"\",\n    \"endereco\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -412,12 +389,262 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/usuarios/3",
+							"raw": "{{base_url}}/clientes/3",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"usuarios",
+								"clientes",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "lojas",
+			"item": [
+				{
+					"name": "produtos",
+					"item": [
+						{
+							"name": "Get Produtos",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "1",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/lojas/103/produtos",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"lojas",
+										"103",
+										"produtos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Post Produtos",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "1",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/lojas/103/produtos",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"lojas",
+										"103",
+										"produtos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DELETE Produto",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "1",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/usuarios/102/favoritos",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"usuarios",
+										"102",
+										"favoritos"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET ALL",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/lojas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lojas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET BY ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/lojas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lojas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"casasbahia\",\n    \"password\": \"abcbahia\",\n    \"role\": \"vendor\",\n    \"nome\": \"Casas Bahia\",    \n    \"CNPJ\": \"987655/0001\",\n    \"email\": \"casabahia@mail.com\",\n    \"telefone\":\"080050599\",\n    \"endereco\": \"Avenida paulista - sp\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/lojas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lojas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 0,   \n    \"password\": \"\",\n    \"role\": \"\",\n    \"nome\": \"\",    \n    \"CNPJ\": \"\",\n    \"email\": \"\",\n    \"telefone\":\"\",\n    \"endereco\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/lojas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lojas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/lojas/3",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lojas",
 								"3"
 							]
 						}

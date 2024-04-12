@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Produto;
-import com.commerce.api.model.Usuario;
 import com.commerce.api.model.Loja;
 import com.commerce.api.model.dto.LojaDTO;
 import com.commerce.api.service.LojaService;
@@ -30,7 +29,7 @@ public class LojaController {
     private LojaService service;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Usuario>> getAll(){
+    public ResponseEntity<List<Loja>> getAll(){
         return ResponseEntity.ok(service.getAllLojas());        
     }
 

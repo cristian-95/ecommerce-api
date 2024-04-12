@@ -8,20 +8,19 @@ import org.springframework.stereotype.Service;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Loja;
 import com.commerce.api.model.Produto;
-import com.commerce.api.model.Usuario;
 import com.commerce.api.model.dto.LojaDTO;
+import com.commerce.api.repository.LojaRepository;
 
-import com.commerce.api.repository.UsuarioRepository;
 
 @Service
 public class LojaService {
 
     @Autowired
-    private UsuarioRepository<Loja> repository;
+    private LojaRepository repository;
     @Autowired
     private ProdutoService produtoService;
 
-    public List<Usuario> getAllLojas() {
+    public List<Loja> getAllLojas() {
         return repository.findAll();
     }
 

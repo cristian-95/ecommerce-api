@@ -28,8 +28,10 @@ public class Produto implements Serializable {
     private HashMap<String, String> specs;
     private Double preco;
     private Long qtdeEstoque;
+    @JsonBackReference
     @ManyToMany(mappedBy = "favoritos")    
     private List<Cliente> clientes;
+
     @ManyToOne
     @JoinColumn(name="loja_id")
     @JsonBackReference

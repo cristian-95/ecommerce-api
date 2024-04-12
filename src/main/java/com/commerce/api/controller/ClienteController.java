@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Produto;
-import com.commerce.api.model.Usuario;
 import com.commerce.api.model.Cliente;
 import com.commerce.api.model.dto.ClienteDTO;
 import com.commerce.api.service.ClienteService;
@@ -30,7 +29,7 @@ public class ClienteController {
     private ClienteService service;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Usuario>> getAll(){
+    public ResponseEntity<List<Cliente>> getAll(){
         return ResponseEntity.ok(service.getAllClientes());        
     }
 

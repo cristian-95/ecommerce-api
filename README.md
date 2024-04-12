@@ -5,7 +5,7 @@
 - [ ] Implementar classes da camada de modelo
   - [ ]  Implementar relacionamentos e cardinalidade
 
-- [ ] Implementar algum filtro na camada de serviço para que a listagem de Clientes não inclua Lojas, e vice versa.
+- [X] Implementar algum filtro na camada de serviço para que a listagem de Clientes não inclua Lojas, e vice versa.
   
 - [ ] Documentação com OpenApi seguindo o exemplo em `ProdutoController`:
   - [ ] Ao final, criar uma Collection a partir da documentação, expórtar em arquivo .json e substituir `ecommerce-api.postman_collection` 
