@@ -7,8 +7,8 @@
 
 - [X] Implementar algum filtro na camada de serviço para que a listagem de Clientes não inclua Lojas, e vice versa.
   
-- [ ] Documentação com OpenApi seguindo o exemplo em `ProdutoController`:
-  - [ ] Ao final, criar uma Collection a partir da documentação, expórtar em arquivo .json e substituir `ecommerce-api.postman_collection` 
+- [X] Documentação com OpenApi seguindo o exemplo em `ProdutoController`:
+  - [X] Ao final, criar uma Collection a partir da documentação, expórtar em arquivo .json e substituir `ecommerce-api.postman_collection` 
   
 - [ ] Tratamento correto de exceções:
   - [ ] Mapear exceptions não tratadas (geralmente erros com código 500, com um texto muito grande), e tratar criando exceptions customizadas como `ResourceNotFoundException` e tratar elas em  `GlobalExceptionHandler`

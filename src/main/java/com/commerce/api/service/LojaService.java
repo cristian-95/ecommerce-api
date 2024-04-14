@@ -53,7 +53,7 @@ public class LojaService {
         }
     }
 
-    public void addProduto(Long lojaId, Long produtoId) throws ResourceNotFoundException {
+    public void adicionarProduto(Long lojaId, Long produtoId) throws ResourceNotFoundException {
         Loja loja = getLojaById(lojaId);
         Produto produto = produtoService.getProdutoById(produtoId);
         
@@ -65,7 +65,7 @@ public class LojaService {
         
     }
 
-    public void removeProduto(Long lojaId, Long produtoId) throws ResourceNotFoundException {
+    public void removerProduto(Long lojaId, Long produtoId) throws ResourceNotFoundException {
         Loja loja = getLojaById(lojaId);
         Produto produto = produtoService.getProdutoById(produtoId);
         

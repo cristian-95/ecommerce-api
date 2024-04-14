@@ -5,6 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import com.commerce.api.model.Produto;
 
+import io.swagger.v3.oas.annotations.Hidden;
+
+@Hidden
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto,Long> {
     
