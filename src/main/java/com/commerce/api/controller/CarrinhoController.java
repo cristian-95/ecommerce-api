@@ -35,7 +35,7 @@ public class CarrinhoController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Exibe um carrinho de compras", description = "Consulta o banco de dados e retorna um determinado carrinho de compras, a partir do número de id passado na URI.", tags = {
-            "Carrinho de Compras" }, responses = {
+        "Carrinho De Compras" }, responses = {
                     @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Produto.class)))),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -50,7 +50,7 @@ public class CarrinhoController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Registra um carrinho de compras", description = "Instancia um novo objeto do tipo CarrinhoDeCompras e salva no banco de dados, a propriedade loja permanece nula inicialmente.", tags = {
-            "Carrinho de Compras" }, responses = {
+        "Carrinho De Compras" }, responses = {
                     @ApiResponse(description = "Created", responseCode = "201", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Produto.class)))),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -63,7 +63,7 @@ public class CarrinhoController {
 
     @PostMapping(value = "/{id}/{operacao}/{produtoId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Atualiza um carrinho de compras", description = "Adiciona ou remove um produto do carrinho, sobrescreve um carrinho de compras existente com a mesma id e salva no banco de dados.", tags = {
-            "Carrinho de Compras" }, responses = {
+        "Carrinho De Compras" }, responses = {
                     @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Produto.class)))),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -79,7 +79,7 @@ public class CarrinhoController {
 
     @DeleteMapping(value = "/{id}")
     @Operation(summary = "Remove um produto", description = "Consulta o banco de dados e remove um determinado produto do banco de dados, a partir do número de id passado na URI.", tags = {
-            "Carrinho de Compras" }, responses = {
+        "Carrinho De Compras" }, responses = {
                     @ApiResponse(description = "No Content", responseCode = "204", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Produto.class)))),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),

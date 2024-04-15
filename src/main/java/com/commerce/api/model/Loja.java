@@ -15,7 +15,7 @@ import jakarta.persistence.Table;
 public class Loja extends Usuario {
 
     private String CNPJ;
-    
+
     @OneToMany(mappedBy = "loja")
     @JsonManagedReference
     private List<Produto> produtos;
@@ -25,21 +25,38 @@ public class Loja extends Usuario {
     private List<Pedido> pedidos;
 
     public Loja() {
-    }
-
-    public Loja(String username, String email, String password, String nome, String telefone, String endereco,
-            String cNPJ) {
-        super(username, email, password, nome, telefone, endereco);
-        this.CNPJ = cNPJ;
+        super();
         this.produtos = new ArrayList<>();
         this.pedidos = new ArrayList<>();
     }
 
+    public Loja(String username, String encriptedPassword, String role) {
+        super(username, encriptedPassword, role); 
+        this.produtos = new ArrayList<>();
+        this.pedidos = new ArrayList<>();
+    }
+    
     public Loja(LojaDTO dto) {
         super(dto);
         this.CNPJ = dto.CNPJ();
         this.produtos = new ArrayList<>();
         this.pedidos = new ArrayList<>();
+    }
+
+    public Loja(String username, String email, String password, String nome, String telefone, String endereco,
+            UserRole role, String cNPJ) {
+        super(username, email, password, nome, telefone, endereco, role);
+        CNPJ = cNPJ;
+        this.produtos = new ArrayList<>();
+        this.pedidos = new ArrayList<>();
+    }
+
+    public Loja(String username, String email, String password, String nome, String telefone, String endereco,
+            UserRole role, String cNPJ, List<Produto> produtos, List<Pedido> pedidos) {
+        super(username, email, password, nome, telefone, endereco, role);
+        CNPJ = cNPJ;
+        this.produtos = produtos;
+        this.pedidos = pedidos;
     }
 
     public String getCNPJ() {
@@ -57,7 +74,6 @@ public class Loja extends Usuario {
     public List<Pedido> getPedidos() {
         return pedidos;
     }
-
 
     public void adicionarProduto(Produto produto) {
         if (!this.produtos.contains(produto)) {

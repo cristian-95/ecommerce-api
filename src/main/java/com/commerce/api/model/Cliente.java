@@ -1,5 +1,6 @@
 package com.commerce.api.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class Cliente extends Usuario {
     private List<Pedido> pedidos;
 
     public Cliente() {
+        super();
         this.favoritos = new ArrayList<>();
         this.pedidos = new ArrayList<>();
         this.carrinhoDeCompras = new CarrinhoDeCompras();
@@ -54,11 +56,16 @@ public class Cliente extends Usuario {
         this.carrinhoDeCompras = new CarrinhoDeCompras();
     }
 
-    
+    public Cliente(String username, String encriptedPassword, String role) {
+        super(username, encriptedPassword, role);
+        this.favoritos = new ArrayList<>();
+        this.pedidos = new ArrayList<>();
+        this.carrinhoDeCompras = new CarrinhoDeCompras();
+    }
 
     public Cliente(String username, String email, String password, String nome, String telefone, String endereco,
-            String sobrenome, String cPF, LocalDate dataNasc, String genero) {
-        super(username, email, password, nome, telefone, endereco);
+            UserRole role, String sobrenome, String cPF, LocalDate dataNasc, String genero) {
+        super(username, email, password, nome, telefone, endereco, role);
         this.sobrenome = sobrenome;
         CPF = cPF;
         this.dataNasc = dataNasc;
@@ -69,9 +76,9 @@ public class Cliente extends Usuario {
     }
 
     public Cliente(String username, String email, String password, String nome, String telefone, String endereco,
-            String sobrenome, String cPF, LocalDate dataNasc, String genero, List<Produto> favoritos,
+            UserRole role, String sobrenome, String cPF, LocalDate dataNasc, String genero, List<Produto> favoritos,
             CarrinhoDeCompras carrinhoDeCompras, List<Pedido> pedidos) {
-        super(username, email, password, nome, telefone, endereco);
+        super(username, email, password, nome, telefone, endereco, role);
         this.sobrenome = sobrenome;
         CPF = cPF;
         this.dataNasc = dataNasc;
@@ -156,5 +163,4 @@ public class Cliente extends Usuario {
     public void setPedidos(List<Pedido> pedidos) {
         this.pedidos = pedidos;
     }
-
 }

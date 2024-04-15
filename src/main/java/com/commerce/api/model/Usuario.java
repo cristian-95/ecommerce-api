@@ -1,13 +1,14 @@
 package com.commerce.api.model;
 
 import com.commerce.api.model.dto.ClienteDTO;
+import com.commerce.api.model.dto.LojaDTO;
+
 import java.util.Collection;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -34,7 +35,7 @@ public class Usuario implements UserDetails {
     private String password;
     private String nome;
     private String telefone;
-    private String endereco;   
+    private String endereco;
 
     private UserRole role;
     private Boolean enabled;
@@ -45,8 +46,6 @@ public class Usuario implements UserDetails {
     public Usuario() {
         setAccountInitialProperties();
     }
-
-    
 
     public Usuario(String username, String email, String password, String nome, String telefone, String endereco,
             UserRole role) {
@@ -60,23 +59,30 @@ public class Usuario implements UserDetails {
         setAccountInitialProperties();
     }
 
-
-
     public Usuario(String username, String password, UserRole role) {
         this.username = username;
         this.password = password;
-        this.role = role;        
+        this.role = role;
         setAccountInitialProperties();
     }
 
     public Usuario(String username, String encriptedPassword, String role) {
         this.username = username;
         this.password = encriptedPassword;
-        this.role = UserRole.valueOf(role.toUpperCase());        
+        this.role = UserRole.valueOf(role.toUpperCase());
         setAccountInitialProperties();
     }
 
     public Usuario(ClienteDTO dto) {
+        this.username = dto.username();
+        this.email = dto.email();
+        this.password = dto.password();
+        this.nome = dto.nome();
+        this.telefone = dto.telefone();
+        this.endereco = dto.endereco();
+    }
+
+    public Usuario(LojaDTO dto) {
         this.username = dto.username();
         this.email = dto.email();
         this.password = dto.password();
@@ -143,11 +149,10 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return switch (this.getRole()) {
-            case "manager" -> List.of(
-                    new SimpleGrantedAuthority("ROLE_USER"),
+        return switch (this.getRole().toUpperCase()) {
+            case "MANAGER" -> List.of(                    
                     new SimpleGrantedAuthority("ROLE_MANAGER"));
-            case "admin" -> List.of(
+            case "ADMIN" -> List.of(
                     new SimpleGrantedAuthority("ROLE_USER"),
                     new SimpleGrantedAuthority("ROLE_MANAGER"),
                     new SimpleGrantedAuthority("ROLE_ADMIN"));

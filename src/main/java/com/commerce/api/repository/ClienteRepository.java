@@ -11,4 +11,8 @@ import io.swagger.v3.oas.annotations.Hidden;
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
+    Cliente findByUsername(String username);
+
+    Boolean existsByUsername(String username);
+
 }

@@ -6,16 +6,25 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.commerce.api.repository.UsuarioRepository;
+import com.commerce.api.repository.ClienteRepository;
+import com.commerce.api.repository.LojaRepository;
 
 @Service
 public class AuthenticationService implements UserDetailsService {
 
     @Autowired
-    private UsuarioRepository repository;
+    private ClienteRepository clienteRepository;
+    @Autowired
+    private LojaRepository lojaRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repository.findByUsername(username);
+        UserDetails user;
+        if (clienteRepository.existsByUsername(username)) {
+            user = clienteRepository.findByUsername(username);
+        } else {
+            user = lojaRepository.findByUsername(username);
+        }
+        return user;
     }
 }
