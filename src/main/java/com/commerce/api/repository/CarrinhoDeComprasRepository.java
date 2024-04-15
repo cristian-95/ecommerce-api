@@ -1,18 +1,13 @@
 package com.commerce.api.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.commerce.api.model.Produto;
+import com.commerce.api.model.CarrinhoDeCompras;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
 @Hidden
 @Repository
-public interface ProdutoRepository extends JpaRepository<Produto,Long> {
-
-    List<Produto> findByLojaId(Long lojaId);
-    
+public interface CarrinhoDeComprasRepository extends JpaRepository<CarrinhoDeCompras, Long> {
 }

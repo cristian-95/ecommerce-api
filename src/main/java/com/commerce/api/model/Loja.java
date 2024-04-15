@@ -15,9 +15,14 @@ import jakarta.persistence.Table;
 public class Loja extends Usuario {
 
     private String CNPJ;
+    
     @OneToMany(mappedBy = "loja")
     @JsonManagedReference
     private List<Produto> produtos;
+
+    @OneToMany(mappedBy = "loja")
+    @JsonManagedReference
+    private List<Pedido> pedidos;
 
     public Loja() {
     }
@@ -27,12 +32,14 @@ public class Loja extends Usuario {
         super(username, email, password, nome, telefone, endereco);
         this.CNPJ = cNPJ;
         this.produtos = new ArrayList<>();
+        this.pedidos = new ArrayList<>();
     }
 
     public Loja(LojaDTO dto) {
         super(dto);
         this.CNPJ = dto.CNPJ();
         this.produtos = new ArrayList<>();
+        this.pedidos = new ArrayList<>();
     }
 
     public String getCNPJ() {
@@ -47,6 +54,11 @@ public class Loja extends Usuario {
         return this.produtos;
     }
 
+    public List<Pedido> getPedidos() {
+        return pedidos;
+    }
+
+
     public void adicionarProduto(Produto produto) {
         if (!this.produtos.contains(produto)) {
             this.produtos.add(produto);
@@ -57,6 +69,14 @@ public class Loja extends Usuario {
         if (!this.produtos.contains(produto)) {
             this.produtos.remove(produto);
         }
+    }
+
+    public void setProdutos(List<Produto> produtos) {
+        this.produtos = produtos;
+    }
+
+    public void setPedidos(List<Pedido> pedidos) {
+        this.pedidos = pedidos;
     }
 
     @Override
@@ -89,4 +109,5 @@ public class Loja extends Usuario {
             return false;
         return true;
     }
+
 }

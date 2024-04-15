@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.commerce.api.exception.ResourceNotFoundException;
+import com.commerce.api.model.CarrinhoDeCompras;
 import com.commerce.api.model.Cliente;
+import com.commerce.api.model.Pedido;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ClienteDTO;
 import com.commerce.api.repository.ClienteRepository;
@@ -53,6 +55,27 @@ public class ClienteService {
         }
     }
 
+    public CarrinhoDeCompras getCarrinho(Long clienteId) {
+        Cliente cliente = getClienteById(clienteId);
+        return cliente.getCarrinhoDeCompras();
+    }
+
+    public Produto adicionarAoCarrinho(Long clienteId, Long produtoId) throws ResourceNotFoundException {
+        Cliente cliente = getClienteById(clienteId);
+        Produto produto = produtoService.getProdutoById(produtoId);
+        cliente.adicionarAoCarrinho(produto);;
+        repository.save(cliente);
+        return produto;
+    }
+
+    public Produto removerDoCarrinho(Long clienteId, Long produtoId) throws ResourceNotFoundException {
+        Cliente cliente = getClienteById(clienteId);
+        Produto produto = produtoService.getProdutoById(produtoId);
+        cliente.removerDoCarrinho(produto);
+        repository.save(cliente);
+        return produto;
+    }
+
     public Produto adicionarFavorito(Long clienteId, Long produtoId) throws ResourceNotFoundException {
         Cliente cliente = getClienteById(clienteId);
         Produto produto = produtoService.getProdutoById(produtoId);
@@ -68,12 +91,17 @@ public class ClienteService {
         repository.save(cliente);
         return produto;
     }
-
+    
     public List<Produto> getAllFavoritos(Long clienteId) {
         Cliente cliente = getClienteById(clienteId);
         return cliente.getFavoritos();
     }
-
+    
+    public List<Pedido> getAllPedidos(Long clienteId) {
+        Cliente cliente = getClienteById(clienteId);
+        return cliente.getPedidos();
+    }
+    
     private Cliente update(Cliente cliente, ClienteDTO dto) {
         cliente.setNome(dto.nome() != null ? dto.nome() : cliente.getNome());
         cliente.setSobrenome(dto.sobrenome() != null ? dto.sobrenome() : cliente.getSobrenome());

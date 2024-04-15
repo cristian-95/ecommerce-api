@@ -57,6 +57,10 @@ public class ProdutoService {
         }
     }
 
+    public List<Produto> getAllProdutosByLojaId(Long lojaId) {
+        return repository.findByLojaId(lojaId);
+    }
+
     private Produto update(ProdutoDTO dto, Produto produto) {
         produto.setNome(dto.nome() != null ? dto.nome() : produto.getNome());
         produto.setDescricao(dto.descricao() != null ? dto.descricao() : produto.getDescricao());

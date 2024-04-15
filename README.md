@@ -2,17 +2,18 @@
 
 ## TO-DO:
 
-- [ ] Implementar classes da camada de modelo
-  - [ ]  Implementar relacionamentos e cardinalidade
+- [ ] Validar entrada, campos como CPF e CNPJ e email (camada de serviço)
+
+- [X] Implementar classes da camada de modelo
+  - [X]  Implementar relacionamentos e cardinalidade
 
 - [X] Implementar algum filtro na camada de serviço para que a listagem de Clientes não inclua Lojas, e vice versa.
   
 - [X] Documentação com OpenApi seguindo o exemplo em `ProdutoController`:
   - [X] Ao final, criar uma Collection a partir da documentação, expórtar em arquivo .json e substituir `ecommerce-api.postman_collection` 
   
-- [ ] Tratamento correto de exceções:
+- [ ] Tratamento correto de exceções *[EM PROGRESSO]*
   - [ ] Mapear exceptions não tratadas (geralmente erros com código 500, com um texto muito grande), e tratar criando exceptions customizadas como `ResourceNotFoundException` e tratar elas em  `GlobalExceptionHandler`
-  - [ ] Validar entrada, campos como CPF e CNPJ e email (camada de serviço)
   
 - [ ] Implementar HATEOAS para que a API seja RESTful (camada de serviço)
 
