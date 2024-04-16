@@ -14,6 +14,8 @@ import jakarta.persistence.Table;
 @Table(name = "lojas")
 public class Loja extends Usuario {
 
+    private static final long serialVersionUID = 1L;
+
     private String CNPJ;
 
     @OneToMany(mappedBy = "loja")
@@ -31,11 +33,11 @@ public class Loja extends Usuario {
     }
 
     public Loja(String username, String encriptedPassword, String role) {
-        super(username, encriptedPassword, role); 
+        super(username, encriptedPassword, role);
         this.produtos = new ArrayList<>();
         this.pedidos = new ArrayList<>();
     }
-    
+
     public Loja(LojaDTO dto) {
         super(dto);
         this.CNPJ = dto.CNPJ();
@@ -101,6 +103,7 @@ public class Loja extends Usuario {
         int result = super.hashCode();
         result = prime * result + ((CNPJ == null) ? 0 : CNPJ.hashCode());
         result = prime * result + ((produtos == null) ? 0 : produtos.hashCode());
+        result = prime * result + ((pedidos == null) ? 0 : pedidos.hashCode());
         return result;
     }
 
@@ -122,6 +125,11 @@ public class Loja extends Usuario {
             if (other.produtos != null)
                 return false;
         } else if (!produtos.equals(other.produtos))
+            return false;
+        if (pedidos == null) {
+            if (other.pedidos != null)
+                return false;
+        } else if (!pedidos.equals(other.pedidos))
             return false;
         return true;
     }

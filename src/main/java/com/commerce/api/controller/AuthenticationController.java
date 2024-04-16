@@ -85,7 +85,7 @@ public class AuthenticationController {
                     return ResponseEntity.badRequest().build();
 
                 encriptedPassword = new BCryptPasswordEncoder().encode(data.password());
-                Cliente newCliente = new Cliente(data.username(), encriptedPassword, data.role());
+                Cliente newCliente = new Cliente(data.username(), encriptedPassword, data.role().toUpperCase());
                 this.clienteRepository.save(newCliente);
                 break;
             default:
@@ -93,7 +93,7 @@ public class AuthenticationController {
                     return ResponseEntity.badRequest().build();
 
                 encriptedPassword = new BCryptPasswordEncoder().encode(data.password());
-                Loja newLoja = new Loja(data.username(), encriptedPassword, data.role());
+                Loja newLoja = new Loja(data.username(), encriptedPassword, data.role().toUpperCase());
                 this.lojaRepository.save(newLoja);
         }
         return ResponseEntity.ok().build();

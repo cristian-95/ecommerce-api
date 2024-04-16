@@ -22,8 +22,8 @@ public class ClienteService {
     private ProdutoService produtoService;
 
     public List<Cliente> getAllClientes() {
-
-        return repository.findAll();
+        List<Cliente> clientes = repository.findAll();
+        return clientes;
     }
 
     public Cliente getClienteById(Long id) {
