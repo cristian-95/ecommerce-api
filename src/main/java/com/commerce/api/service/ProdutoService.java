@@ -1,67 +1,71 @@
 package com.commerce.api.service;
 
-import java.util.List;
-
+import com.commerce.api.controller.ProdutoController;
+import com.commerce.api.exception.ResourceNotFoundException;
+import com.commerce.api.model.Produto;
+import com.commerce.api.model.dto.ProdutoDTO;
+import com.commerce.api.repository.ProdutoRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.commerce.api.exception.ResourceNotFoundException;
+import java.util.List;
 
-import com.commerce.api.model.Produto;
-import com.commerce.api.model.dto.ProdutoDTO;
-import com.commerce.api.repository.ProdutoRepository;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 public class ProdutoService {
 
     @Autowired
-    private ProdutoRepository repository;
+    private ProdutoRepository produtoRepository;
 
     public List<Produto> getAllProdutos() {
-        return repository.findAll();
+        List<Produto> produtos = produtoRepository.findAll();
+        produtos.forEach(p -> p.add(linkTo(methodOn(ProdutoController.class).getById(p.getId())).withSelfRel()));
+        return produtos;
     }
 
     public Produto getProdutoById(Long id) throws ResourceNotFoundException {
-        try {
-            Produto produto = repository.findById(id).get();
-            return produto;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Produto (id = %d) não encontrado".formatted(id));
-        }
+        Produto produto = produtoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
+        produto.add(linkTo(methodOn(ProdutoController.class).getAll()).withRel("Listagem"));
+        return produto;
     }
 
     public Produto createProduto(ProdutoDTO dto) {
-        var produto = new Produto(dto);
-        return repository.save(produto);
+        Produto produto = new Produto(dto);
+        Produto saved = produtoRepository.save(produto);
+        saved.add(linkTo(methodOn(ProdutoController.class).getById(saved.getId())).withSelfRel());
+        return saved;
     }
 
     public Produto updateProduto(ProdutoDTO dto) throws ResourceNotFoundException {
         Produto produto = getProdutoById(dto.id());
-        produto = update(dto, produto);
-        return repository.save(produto);
+        Produto updated = produtoRepository.save(updateProperties(produto, dto));
+        updated.add(linkTo(methodOn(ProdutoController.class).getById(updated.getId())).withSelfRel());
+        return updated;
     }
 
     public void updateProduto(Produto updatedProduto) throws ResourceNotFoundException {
         Produto produto = getProdutoById(updatedProduto.getId());
         BeanUtils.copyProperties(updatedProduto, produto);
-        repository.save(produto);
+        produtoRepository.save(produto);
     }
 
     public void deleteProduto(Long id) throws Exception {
         try {
-            Produto produto = repository.findById(id).get();
-            repository.delete(produto);
+            Produto produto = produtoRepository.findById(id).get();
+            produtoRepository.delete(produto);
         } catch (Exception e) {
             throw new ResourceNotFoundException("Produto (id = %d) não encontrado".formatted(id));
         }
     }
 
     public List<Produto> getAllProdutosByLojaId(Long lojaId) {
-        return repository.findByLojaId(lojaId);
+        return produtoRepository.findByLojaId(lojaId);
     }
 
-    private Produto update(ProdutoDTO dto, Produto produto) {
+    private Produto updateProperties(Produto produto, ProdutoDTO dto) {
         produto.setNome(dto.nome() != null ? dto.nome() : produto.getNome());
         produto.setDescricao(dto.descricao() != null ? dto.descricao() : produto.getDescricao());
         produto.setPreco(dto.preco() != null ? dto.preco() : produto.getPreco());

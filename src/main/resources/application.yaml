@@ -1,0 +1,35 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: e-commerce-api
+
+  # Configurações do Postgres:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/e-commerce-api_db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+# Configurações de segurança:
+e-commerce-api:
+  security:
+    token:
+      secret: ${API_SECRET}
+
+# Configurações do SpringDoc:
+springdoc:
+  pathsToMatch:
+    - /clientes**
+    - /lojas**
+    - /produtos**
+    - /carrinho**
+    - /pedidos**
+    - /auth/login
+    - /auth/register
+  swagger-ui:
+    path: /

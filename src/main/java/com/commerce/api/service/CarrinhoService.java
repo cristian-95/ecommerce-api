@@ -1,17 +1,13 @@
 package com.commerce.api.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.commerce.api.exception.InvalidOperationException;
 import com.commerce.api.exception.ResourceNotFoundException;
-
 import com.commerce.api.model.CarrinhoDeCompras;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.CarrinhoDeComprasDTO;
 import com.commerce.api.repository.CarrinhoDeComprasRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CarrinhoService {
@@ -21,14 +17,9 @@ public class CarrinhoService {
     @Autowired
     private ProdutoService produtoService;
 
-    public List<CarrinhoDeCompras> getAllCarrinhoDeComprass() {
-        return repository.findAll();
-    }
-
     public CarrinhoDeCompras getCarrinhoDeComprasById(Long id) throws ResourceNotFoundException {
         try {
-            CarrinhoDeCompras carrinhoDeCompras = repository.findById(id).get();
-            return carrinhoDeCompras;
+            return repository.findById(id).get();
         } catch (Exception e) {
             throw new ResourceNotFoundException("CarrinhoDeCompras (id = %d) não encontrado".formatted(id));
         }
@@ -48,18 +39,19 @@ public class CarrinhoService {
         }
     }
 
-    public CarrinhoDeCompras update(Long carrinhoId, String operacao, Long produtoId)
+    public CarrinhoDeCompras adicionarItem(Long carrinhoId, Long produtoId)
             throws InvalidOperationException, ResourceNotFoundException {
         CarrinhoDeCompras carrinhoDeCompras = getCarrinhoDeComprasById(carrinhoId);
         Produto produto = produtoService.getProdutoById(produtoId);
-        if (operacao.equalsIgnoreCase("adicionar")) {
-            carrinhoDeCompras.adicionarItem(produto);
-            return repository.save(carrinhoDeCompras);
-        } else if (operacao.equalsIgnoreCase("remover")) {
-            carrinhoDeCompras.removerItem(produto);
-            return repository.save(carrinhoDeCompras);
-        } else {
-            throw new InvalidOperationException();
-        }
+        carrinhoDeCompras.adicionarItem(produto);
+        return repository.save(carrinhoDeCompras);
+    }
+
+    public CarrinhoDeCompras removerItem(Long carrinhoId, Long produtoId)
+            throws InvalidOperationException, ResourceNotFoundException {
+        CarrinhoDeCompras carrinhoDeCompras = getCarrinhoDeComprasById(carrinhoId);
+        Produto produto = produtoService.getProdutoById(produtoId);
+        carrinhoDeCompras.removerItem(produto);
+        return repository.save(carrinhoDeCompras);
     }
 }
