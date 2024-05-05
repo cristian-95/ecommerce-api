@@ -1,14 +1,14 @@
 package com.commerce.api.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.commerce.api.model.dto.LojaDTO;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import org.hibernate.validator.constraints.br.CNPJ;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "lojas")
@@ -16,6 +16,7 @@ public class Loja extends Usuario {
 
     private static final long serialVersionUID = 1L;
 
+    @CNPJ
     private String CNPJ;
 
     @OneToMany(mappedBy = "loja")
@@ -46,7 +47,7 @@ public class Loja extends Usuario {
     }
 
     public Loja(String username, String email, String password, String nome, String telefone, String endereco,
-            UserRole role, String cNPJ) {
+                UserRole role, String cNPJ) {
         super(username, email, password, nome, telefone, endereco, role);
         CNPJ = cNPJ;
         this.produtos = new ArrayList<>();
@@ -54,7 +55,7 @@ public class Loja extends Usuario {
     }
 
     public Loja(String username, String email, String password, String nome, String telefone, String endereco,
-            UserRole role, String cNPJ, List<Produto> produtos, List<Pedido> pedidos) {
+                UserRole role, String cNPJ, List<Produto> produtos, List<Pedido> pedidos) {
         super(username, email, password, nome, telefone, endereco, role);
         CNPJ = cNPJ;
         this.produtos = produtos;

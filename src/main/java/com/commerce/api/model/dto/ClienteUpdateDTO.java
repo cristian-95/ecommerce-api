@@ -3,20 +3,23 @@ package com.commerce.api.model.dto;
 import com.commerce.api.validation.constraints.Telefone;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
-import org.hibernate.validator.constraints.br.CNPJ;
+import org.hibernate.validator.constraints.br.CPF;
 
-public record LojaDTO(
+import java.time.LocalDate;
+
+public record ClienteUpdateDTO(
         Long id,
-        String username,
         @Email(message = "E-mail em formato inválido.")
         String email,
-        String password,
         @Column(nullable = true)
         @Telefone
         String telefone,
         String endereco,
         String nome,
-        @CNPJ
-        String CNPJ
+        String sobrenome,
+        @CPF
+        String CPF,
+        LocalDate dataNasc,
+        String genero
 ) {
 }

@@ -1,33 +1,24 @@
 package com.commerce.api.model;
 
-import java.io.Serializable;
+import com.commerce.api.model.dto.ClienteDTO;
+import jakarta.persistence.*;
+import org.hibernate.validator.constraints.br.CPF;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.commerce.api.model.dto.ClienteDTO;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.DiscriminatorValue;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "clientes")
 @DiscriminatorValue("Cliente")
 public class Cliente extends Usuario {
 
-    private static final long serialVersionUID = 1L;
-
     private String sobrenome;
-    private String CPF;
+
+    @CPF
+    private String cpf;
     private LocalDate dataNasc;
+
     private String genero;
     @ManyToMany
     @JoinTable(name = "favoritos", joinColumns = @JoinColumn(name = "cliente_id"), inverseJoinColumns = @JoinColumn(name = "produto_id"))
@@ -50,7 +41,7 @@ public class Cliente extends Usuario {
     public Cliente(ClienteDTO dto) {
         super(dto);
         this.sobrenome = dto.sobrenome();
-        this.CPF = dto.CPF();
+        this.cpf = dto.CPF();
         this.dataNasc = dto.dataNasc();
         this.genero = dto.genero();
         this.favoritos = new ArrayList<>();
@@ -66,10 +57,10 @@ public class Cliente extends Usuario {
     }
 
     public Cliente(String username, String email, String password, String nome, String telefone, String endereco,
-            UserRole role, String sobrenome, String cPF, LocalDate dataNasc, String genero) {
+                   UserRole role, String sobrenome, String cPF, LocalDate dataNasc, String genero) {
         super(username, email, password, nome, telefone, endereco, role);
         this.sobrenome = sobrenome;
-        CPF = cPF;
+        cpf = cPF;
         this.dataNasc = dataNasc;
         this.genero = genero;
         this.favoritos = new ArrayList<>();
@@ -78,11 +69,11 @@ public class Cliente extends Usuario {
     }
 
     public Cliente(String username, String email, String password, String nome, String telefone, String endereco,
-            UserRole role, String sobrenome, String cPF, LocalDate dataNasc, String genero, List<Produto> favoritos,
-            CarrinhoDeCompras carrinhoDeCompras, List<Pedido> pedidos) {
+                   UserRole role, String sobrenome, String cPF, LocalDate dataNasc, String genero, List<Produto> favoritos,
+                   CarrinhoDeCompras carrinhoDeCompras, List<Pedido> pedidos) {
         super(username, email, password, nome, telefone, endereco, role);
         this.sobrenome = sobrenome;
-        CPF = cPF;
+        cpf = cPF;
         this.dataNasc = dataNasc;
         this.genero = genero;
         this.favoritos = favoritos;
@@ -118,12 +109,12 @@ public class Cliente extends Usuario {
         this.sobrenome = sobrenome;
     }
 
-    public String getCPF() {
-        return CPF;
+    public String getCpf() {
+        return cpf;
     }
 
-    public void setCPF(String CPF) {
-        this.CPF = CPF;
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 
     public LocalDate getDataNasc() {
@@ -171,7 +162,7 @@ public class Cliente extends Usuario {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((sobrenome == null) ? 0 : sobrenome.hashCode());
-        result = prime * result + ((CPF == null) ? 0 : CPF.hashCode());
+        result = prime * result + ((cpf == null) ? 0 : cpf.hashCode());
         result = prime * result + ((dataNasc == null) ? 0 : dataNasc.hashCode());
         result = prime * result + ((genero == null) ? 0 : genero.hashCode());
         result = prime * result + ((favoritos == null) ? 0 : favoritos.hashCode());
@@ -194,10 +185,10 @@ public class Cliente extends Usuario {
                 return false;
         } else if (!sobrenome.equals(other.sobrenome))
             return false;
-        if (CPF == null) {
-            if (other.CPF != null)
+        if (cpf == null) {
+            if (other.cpf != null)
                 return false;
-        } else if (!CPF.equals(other.CPF))
+        } else if (!cpf.equals(other.cpf))
             return false;
         if (dataNasc == null) {
             if (other.dataNasc != null)

@@ -2,45 +2,47 @@ package com.commerce.api.model;
 
 import com.commerce.api.model.dto.ClienteDTO;
 import com.commerce.api.model.dto.LojaDTO;
-
-import java.util.Collection;
-import java.util.List;
-
+import com.commerce.api.validation.constraints.Telefone;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorColumn;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-import jakarta.persistence.Table;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @DiscriminatorColumn(name = "Usuario_Type")
 @Table(name = "usuarios")
-public class Usuario implements UserDetails {
+public class Usuario extends RepresentationModel<Usuario> implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(unique = true)
     private String username;
+    @Email(message = "E-mail em formato inválido.")
     private String email;
     private String password;
     private String nome;
+    @Column(nullable = true)
+    @Telefone
     private String telefone;
     private String endereco;
 
+    @JsonIgnore
     private UserRole role;
+    @JsonIgnore
     private Boolean enabled;
+    @JsonIgnore
     private Boolean accountNonLocked;
+    @JsonIgnore
     private Boolean accountNonExpired;
+    @JsonIgnore
     private Boolean credentialsNonExpired;
 
     public Usuario() {
@@ -48,11 +50,12 @@ public class Usuario implements UserDetails {
     }
 
     public Usuario(String username, String email, String password, String nome, String telefone, String endereco,
-            UserRole role) {
+                   UserRole role) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.nome = nome;
+
         this.telefone = telefone;
         this.endereco = endereco;
         this.role = role;

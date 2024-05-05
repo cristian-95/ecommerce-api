@@ -1,48 +1,48 @@
 package com.commerce.api.model;
 
+import com.commerce.api.model.dto.ProdutoDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
+import org.springframework.hateoas.RepresentationModel;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
-import com.commerce.api.model.dto.ProdutoDTO;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-
 @Entity
 @Table(name = "produtos")
-public class Produto implements Serializable {
+public class Produto extends RepresentationModel<Produto> implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Size(min = 2, max = 80)
     private String nome;
+
     private String descricao;
     private HashMap<String, String> specs;
     private Double preco;
+
+    @Min(0)
     private Long qtdeEstoque;
-    @JsonBackReference
-    @ManyToMany(mappedBy = "favoritos")    
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "favoritos")
     private List<Cliente> clientes;
 
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name="loja_id")
-    @JsonBackReference
+    @JoinColumn(name = "loja_id")
     private Loja loja;
-
 
     public Produto() {
     }
 
     public Produto(Long id, String nome, HashMap<String, String> specs, Double preco, Long qtdeEstoque,
-            String descricao) {
+                   String descricao) {
         this.id = id;
         this.nome = nome;
         this.specs = specs;
@@ -124,7 +124,6 @@ public class Produto implements Serializable {
         this.loja = loja;
     }
 
-    
 
     @Override
     public int hashCode() {
@@ -181,5 +180,5 @@ public class Produto implements Serializable {
         return true;
     }
 
-    
+
 }

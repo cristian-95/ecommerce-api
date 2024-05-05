@@ -1,14 +1,9 @@
 package com.commerce.api.model;
 
-import java.io.Serializable;
-
 import com.commerce.api.model.dto.PagamentoDTO;
+import jakarta.persistence.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "pagamentos")
@@ -94,5 +89,5 @@ public class Pagamento implements Serializable {
         } else if (!status.equals(other.status))
             return false;
         return true;
-    }  
+    }
 } 
