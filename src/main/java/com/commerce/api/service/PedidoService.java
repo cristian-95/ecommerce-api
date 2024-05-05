@@ -1,18 +1,13 @@
 package com.commerce.api.service;
 
-import java.util.List;
-
+import com.commerce.api.exception.ResourceNotFoundException;
+import com.commerce.api.model.*;
+import com.commerce.api.model.dto.PedidoDTO;
+import com.commerce.api.repository.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.commerce.api.exception.ResourceNotFoundException;
-import com.commerce.api.model.CarrinhoDeCompras;
-import com.commerce.api.model.Cliente;
-import com.commerce.api.model.Loja;
-import com.commerce.api.model.Pedido;
-import com.commerce.api.model.PedidoStatus;
-import com.commerce.api.model.dto.PedidoDTO;
-import com.commerce.api.repository.PedidoRepository;
+import java.util.List;
 
 @Service
 public class PedidoService {
@@ -25,7 +20,7 @@ public class PedidoService {
     private LojaService lojaService;
     @Autowired
     private ClienteService clienteService;
-    
+
 
     public List<Pedido> getAllPedidos() {
         return repository.findAll();
@@ -42,7 +37,7 @@ public class PedidoService {
 
     public Pedido createPedido(PedidoDTO dto) throws ResourceNotFoundException {
         CarrinhoDeCompras carrinho = carrinhoService.getCarrinhoDeComprasById(dto.carrinhoId());
-        Loja loja  = lojaService.getLojaById(dto.lojaId());
+        Loja loja = lojaService.getLojaById(dto.lojaId());
         Cliente cliente = clienteService.getClienteById(dto.clienteId());
         Pedido pedido = new Pedido(cliente, loja, PedidoStatus.PENDENTE, carrinho);
         return repository.save(pedido);

@@ -1,8 +1,8 @@
 package com.commerce.api.exception;
 
-import java.time.LocalTime;
-
 import org.springframework.stereotype.Component;
+
+import java.time.LocalTime;
 
 @Component
 public class ErrorMessage {
@@ -37,11 +37,11 @@ public class ErrorMessage {
         this.statusCode = statusCode;
     }
 
-    public LocalTime  getTimestamp() {
+    public LocalTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalTime  timestamp) {
+    public void setTimestamp(LocalTime timestamp) {
         this.timestamp = timestamp;
     }
 }

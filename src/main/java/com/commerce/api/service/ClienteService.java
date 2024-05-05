@@ -1,17 +1,22 @@
 package com.commerce.api.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.commerce.api.controller.ClienteController;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.CarrinhoDeCompras;
 import com.commerce.api.model.Cliente;
 import com.commerce.api.model.Pedido;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ClienteDTO;
+import com.commerce.api.model.dto.ClienteUpdateDTO;
 import com.commerce.api.repository.ClienteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 public class ClienteService {
@@ -23,27 +28,30 @@ public class ClienteService {
 
     public List<Cliente> getAllClientes() {
         List<Cliente> clientes = repository.findAll();
+        clientes.forEach(c -> c.add(linkTo(methodOn(ClienteController.class).getById(c.getId())).withSelfRel()));
         return clientes;
     }
 
-    public Cliente getClienteById(Long id) {
-        try {
-            Cliente cliente = (Cliente) repository.findById(id).get();
-            return cliente;
-        } catch (Exception e) {
-            return null;
-        }
+    public Cliente getClienteById(Long id) throws ResourceNotFoundException {
+        Cliente cliente = (Cliente) repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
+        cliente.add(linkTo(methodOn(ClienteController.class).getAll()).withRel("Listagem"));
+        return cliente;
     }
 
-    public Cliente createCliente(ClienteDTO dto) {
+    public Cliente createCliente(ClienteDTO dto) throws ResourceNotFoundException {
         Cliente cliente = new Cliente(dto);
-        return repository.save(cliente);
+        String encriptedPassword = new BCryptPasswordEncoder().encode(dto.password());
+        cliente.setPassword(encriptedPassword);
+        Cliente saved = repository.save(cliente);
+        saved.add(linkTo(methodOn(ClienteController.class).getById(saved.getId())).withSelfRel());
+        return saved;
     }
 
-    public Cliente updateCliente(ClienteDTO dto) {
+    public Cliente updateCliente(ClienteUpdateDTO dto) throws ResourceNotFoundException {
         Cliente cliente = getClienteById(dto.id());
-        cliente = update(cliente, dto);
-        return repository.save(cliente);
+        Cliente updated = repository.save(updateProperties(cliente, dto));
+        updated.add(linkTo(methodOn(ClienteController.class).getById(updated.getId())).withSelfRel());
+        return updated;
     }
 
     public void deleteCliente(Long id) throws Exception {
@@ -55,7 +63,7 @@ public class ClienteService {
         }
     }
 
-    public CarrinhoDeCompras getCarrinho(Long clienteId) {
+    public CarrinhoDeCompras getCarrinho(Long clienteId) throws ResourceNotFoundException {
         Cliente cliente = getClienteById(clienteId);
         return cliente.getCarrinhoDeCompras();
     }
@@ -63,7 +71,8 @@ public class ClienteService {
     public Produto adicionarAoCarrinho(Long clienteId, Long produtoId) throws ResourceNotFoundException {
         Cliente cliente = getClienteById(clienteId);
         Produto produto = produtoService.getProdutoById(produtoId);
-        cliente.adicionarAoCarrinho(produto);;
+        cliente.adicionarAoCarrinho(produto);
+        ;
         repository.save(cliente);
         return produto;
     }
@@ -91,21 +100,21 @@ public class ClienteService {
         repository.save(cliente);
         return produto;
     }
-    
-    public List<Produto> getAllFavoritos(Long clienteId) {
+
+    public List<Produto> getAllFavoritos(Long clienteId) throws ResourceNotFoundException {
         Cliente cliente = getClienteById(clienteId);
         return cliente.getFavoritos();
     }
-    
-    public List<Pedido> getAllPedidos(Long clienteId) {
+
+    public List<Pedido> getAllPedidos(Long clienteId) throws ResourceNotFoundException {
         Cliente cliente = getClienteById(clienteId);
         return cliente.getPedidos();
     }
-    
-    private Cliente update(Cliente cliente, ClienteDTO dto) {
+
+    private Cliente updateProperties(Cliente cliente, ClienteUpdateDTO dto) {
         cliente.setNome(dto.nome() != null ? dto.nome() : cliente.getNome());
         cliente.setSobrenome(dto.sobrenome() != null ? dto.sobrenome() : cliente.getSobrenome());
-        cliente.setCPF(dto.CPF() != null ? dto.CPF() : cliente.getCPF());
+        cliente.setCpf(dto.CPF() != null ? dto.CPF() : cliente.getCpf());
         cliente.setEmail(dto.email() != null ? dto.email() : cliente.getEmail());
         cliente.setTelefone(dto.telefone() != null ? dto.telefone() : cliente.getTelefone());
         cliente.setEndereco(dto.endereco() != null ? dto.endereco() : cliente.getEndereco());
