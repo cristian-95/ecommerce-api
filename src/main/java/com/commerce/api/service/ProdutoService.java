@@ -52,7 +52,7 @@ public class ProdutoService {
         produtoRepository.save(produto);
     }
 
-    public void deleteProduto(Long id) throws Exception {
+    public void deleteProduto(Long id) {
         try {
             Produto produto = produtoRepository.findById(id).get();
             produtoRepository.delete(produto);
@@ -62,7 +62,9 @@ public class ProdutoService {
     }
 
     public List<Produto> getAllProdutosByLojaId(Long lojaId) {
-        return produtoRepository.findByLojaId(lojaId);
+        List<Produto> produtos = produtoRepository.findByLojaId(lojaId);
+        produtos.forEach(p -> p.add(linkTo(methodOn(ProdutoController.class).getById(p.getId())).withSelfRel()));
+        return produtos;
     }
 
     private Produto updateProperties(Produto produto, ProdutoDTO dto) {

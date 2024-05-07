@@ -1,6 +1,5 @@
 package com.commerce.api.controller;
 
-import com.commerce.api.exception.InvalidOperationException;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.CarrinhoDeCompras;
 import com.commerce.api.model.Produto;
@@ -51,7 +50,7 @@ public class CarrinhoController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<CarrinhoDeCompras> create(@RequestBody CarrinhoDeComprasDTO dto) {
-        return new ResponseEntity<CarrinhoDeCompras>(service.createCarrinhoDeCompras(dto), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.createCarrinhoDeCompras(dto), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}/adicionar", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -65,7 +64,7 @@ public class CarrinhoController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<CarrinhoDeCompras> adicionarItem(@PathVariable("id") Long id, @RequestBody Long produtoId)
-            throws ResourceNotFoundException, InvalidOperationException {
+            throws ResourceNotFoundException {
         return ResponseEntity.ok(service.adicionarItem(id, produtoId));
     }
 
@@ -80,7 +79,7 @@ public class CarrinhoController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<CarrinhoDeCompras> removerItem(@PathVariable("id") Long id, @RequestBody Long produtoId)
-            throws ResourceNotFoundException, InvalidOperationException {
+            throws ResourceNotFoundException {
         return ResponseEntity.ok(service.removerItem(id, produtoId));
     }
 

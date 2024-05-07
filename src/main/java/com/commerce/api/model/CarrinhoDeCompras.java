@@ -24,8 +24,9 @@ public class CarrinhoDeCompras {
     @Min(0)
     private Double total;
 
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
     @JsonBackReference
-    @OneToOne(mappedBy = "carrinhoDeCompras")
     private Cliente cliente;
 
     public CarrinhoDeCompras() {

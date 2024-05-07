@@ -25,6 +25,8 @@ public class ClienteService {
     private ClienteRepository repository;
     @Autowired
     private ProdutoService produtoService;
+    @Autowired
+    private CarrinhoService carrinhoService;
 
     public List<Cliente> getAllClientes() {
         List<Cliente> clientes = repository.findAll();
@@ -33,7 +35,7 @@ public class ClienteService {
     }
 
     public Cliente getClienteById(Long id) throws ResourceNotFoundException {
-        Cliente cliente = (Cliente) repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
+        Cliente cliente = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
         cliente.add(linkTo(methodOn(ClienteController.class).getAll()).withRel("Listagem"));
         return cliente;
     }
@@ -54,35 +56,30 @@ public class ClienteService {
         return updated;
     }
 
-    public void deleteCliente(Long id) throws Exception {
+    public void deleteCliente(Long id) {
         try {
-            Cliente cliente = (Cliente) repository.findById(id).get();
+            Cliente cliente = repository.findById(id).get();
             repository.delete(cliente);
         } catch (Exception e) {
-            System.err.println("DELETE:Cliente: %d não encontrado".formatted(id));
+            System.err.printf("DELETE:Cliente: %d não encontrado%n", id);
         }
     }
 
     public CarrinhoDeCompras getCarrinho(Long clienteId) throws ResourceNotFoundException {
         Cliente cliente = getClienteById(clienteId);
-        return cliente.getCarrinhoDeCompras();
+        return cliente.getCarrinhoDeCompras().get(0);
     }
 
-    public Produto adicionarAoCarrinho(Long clienteId, Long produtoId) throws ResourceNotFoundException {
-        Cliente cliente = getClienteById(clienteId);
-        Produto produto = produtoService.getProdutoById(produtoId);
-        cliente.adicionarAoCarrinho(produto);
-        ;
-        repository.save(cliente);
-        return produto;
+    public CarrinhoDeCompras adicionarAoCarrinho(Long clienteId, Long produtoId) throws ResourceNotFoundException {
+        CarrinhoDeCompras carrinhoDeCompras = getCarrinho(clienteId);
+        carrinhoDeCompras = carrinhoService.adicionarItem(carrinhoDeCompras, produtoId);
+        return carrinhoDeCompras;
     }
 
-    public Produto removerDoCarrinho(Long clienteId, Long produtoId) throws ResourceNotFoundException {
-        Cliente cliente = getClienteById(clienteId);
-        Produto produto = produtoService.getProdutoById(produtoId);
-        cliente.removerDoCarrinho(produto);
-        repository.save(cliente);
-        return produto;
+    public CarrinhoDeCompras removerDoCarrinho(Long clienteId, Long produtoId) throws ResourceNotFoundException {
+        CarrinhoDeCompras carrinhoDeCompras = getCarrinho(clienteId);
+        carrinhoDeCompras = carrinhoService.removerItem(carrinhoDeCompras, produtoId);
+        return carrinhoDeCompras;
     }
 
     public Produto adicionarFavorito(Long clienteId, Long produtoId) throws ResourceNotFoundException {

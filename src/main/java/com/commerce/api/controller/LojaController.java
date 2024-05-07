@@ -62,7 +62,7 @@ public class LojaController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<?> getById(@PathVariable("id") Long id) {
-        Loja loja = null;
+        Loja loja;
         try {
             loja = service.getLojaById(id);
         } catch (ResourceNotFoundException e) {
@@ -84,8 +84,8 @@ public class LojaController {
             @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Loja> create(@RequestBody @Valid LojaDTO dto) throws Exception {
-        return new ResponseEntity<Loja>(service.createLoja(dto), HttpStatus.CREATED);
+    public ResponseEntity<Loja> create(@RequestBody @Valid LojaDTO dto) {
+        return new ResponseEntity<>(service.createLoja(dto), HttpStatus.CREATED);
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -102,7 +102,7 @@ public class LojaController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Loja> update(@RequestBody @Valid LojaUpdateDTO dto) throws Exception {
+    public ResponseEntity<Loja> update(@RequestBody @Valid LojaUpdateDTO dto) {
         return ResponseEntity.ok(service.updateLoja(dto));
     }
 

@@ -80,7 +80,7 @@ public class ProdutoController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<Produto> create(@RequestBody @Valid ProdutoDTO dto) {
-        return new ResponseEntity<Produto>(service.createProduto(dto), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.createProduto(dto), HttpStatus.CREATED);
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

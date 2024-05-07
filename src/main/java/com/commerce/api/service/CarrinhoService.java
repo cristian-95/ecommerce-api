@@ -1,6 +1,5 @@
 package com.commerce.api.service;
 
-import com.commerce.api.exception.InvalidOperationException;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.CarrinhoDeCompras;
 import com.commerce.api.model.Produto;
@@ -30,7 +29,7 @@ public class CarrinhoService {
         return repository.save(carrinhoDeCompras);
     }
 
-    public void deleteCarrinhoDeCompras(Long id) throws Exception {
+    public void deleteCarrinhoDeCompras(Long id) {
         try {
             CarrinhoDeCompras carrinhoDeCompras = repository.findById(id).get();
             repository.delete(carrinhoDeCompras);
@@ -40,16 +39,30 @@ public class CarrinhoService {
     }
 
     public CarrinhoDeCompras adicionarItem(Long carrinhoId, Long produtoId)
-            throws InvalidOperationException, ResourceNotFoundException {
+            throws ResourceNotFoundException {
         CarrinhoDeCompras carrinhoDeCompras = getCarrinhoDeComprasById(carrinhoId);
         Produto produto = produtoService.getProdutoById(produtoId);
         carrinhoDeCompras.adicionarItem(produto);
         return repository.save(carrinhoDeCompras);
     }
 
+    public CarrinhoDeCompras adicionarItem(CarrinhoDeCompras carrinhoDeCompras, Long produtoId)
+            throws ResourceNotFoundException {
+        Produto produto = produtoService.getProdutoById(produtoId);
+        carrinhoDeCompras.adicionarItem(produto);
+        return repository.save(carrinhoDeCompras);
+    }
+
     public CarrinhoDeCompras removerItem(Long carrinhoId, Long produtoId)
-            throws InvalidOperationException, ResourceNotFoundException {
+            throws ResourceNotFoundException {
         CarrinhoDeCompras carrinhoDeCompras = getCarrinhoDeComprasById(carrinhoId);
+        Produto produto = produtoService.getProdutoById(produtoId);
+        carrinhoDeCompras.removerItem(produto);
+        return repository.save(carrinhoDeCompras);
+    }
+
+    public CarrinhoDeCompras removerItem(CarrinhoDeCompras carrinhoDeCompras, Long produtoId)
+            throws ResourceNotFoundException {
         Produto produto = produtoService.getProdutoById(produtoId);
         carrinhoDeCompras.removerItem(produto);
         return repository.save(carrinhoDeCompras);

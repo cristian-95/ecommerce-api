@@ -27,6 +27,7 @@ public class Usuario extends RepresentationModel<Usuario> implements UserDetails
     private String username;
     @Email(message = "E-mail em formato inválido.")
     private String email;
+    @JsonIgnore
     private String password;
     private String nome;
     @Column(nullable = true)

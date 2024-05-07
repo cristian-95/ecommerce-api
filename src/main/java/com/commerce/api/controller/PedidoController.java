@@ -79,7 +79,7 @@ public class PedidoController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<Pedido> create(@RequestBody PedidoDTO dto) throws ResourceNotFoundException {
-        return new ResponseEntity<Pedido>(service.createPedido(dto), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.createPedido(dto), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/{id}")

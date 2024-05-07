@@ -7,6 +7,7 @@ import com.commerce.api.model.Pedido;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ClienteDTO;
 import com.commerce.api.model.dto.ClienteUpdateDTO;
+import com.commerce.api.service.CarrinhoService;
 import com.commerce.api.service.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -30,6 +31,8 @@ public class ClienteController {
 
     @Autowired
     private ClienteService service;
+    @Autowired
+    private CarrinhoService carrinhoService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Lista todos os clientes", description = "Consulta o banco de dados e retorna todos os clientes.", tags = {
@@ -56,7 +59,7 @@ public class ClienteController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<?> getById(@PathVariable("id") Long id) {
-        Cliente cliente = null;
+        Cliente cliente;
         try {
             cliente = service.getClienteById(id);
         } catch (ResourceNotFoundException e) {
@@ -75,7 +78,7 @@ public class ClienteController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<Cliente> create(@RequestBody @Valid ClienteDTO dto) throws ResourceNotFoundException {
-        return new ResponseEntity<Cliente>(service.createCliente(dto), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.createCliente(dto), HttpStatus.CREATED);
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -131,7 +134,7 @@ public class ClienteController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Produto> adicionarAoCarrinho(@PathVariable("id") Long clienteID, @RequestBody Long produtoId)
+    public ResponseEntity<CarrinhoDeCompras> adicionarAoCarrinho(@PathVariable("id") Long clienteID, @RequestBody Long produtoId)
             throws ResourceNotFoundException {
         return ResponseEntity.ok(service.adicionarAoCarrinho(clienteID, produtoId));
     }
@@ -146,7 +149,7 @@ public class ClienteController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Produto> removerDoCarrinho(@PathVariable("id") Long clienteID, @RequestBody Long produtoId)
+    public ResponseEntity<CarrinhoDeCompras> removerDoCarrinho(@PathVariable("id") Long clienteID, @RequestBody Long produtoId)
             throws ResourceNotFoundException {
         return ResponseEntity.ok(service.removerDoCarrinho(clienteID, produtoId));
     }

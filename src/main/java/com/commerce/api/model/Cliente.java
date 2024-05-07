@@ -24,9 +24,8 @@ public class Cliente extends Usuario {
     @JoinTable(name = "favoritos", joinColumns = @JoinColumn(name = "cliente_id"), inverseJoinColumns = @JoinColumn(name = "produto_id"))
     private List<Produto> favoritos;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "carrinho_id", referencedColumnName = "id")
-    private CarrinhoDeCompras carrinhoDeCompras;
+    @OneToMany(mappedBy = "cliente")
+    private List<CarrinhoDeCompras> carrinhoDeCompras;
 
     @OneToMany(mappedBy = "cliente")
     private List<Pedido> pedidos;
@@ -35,7 +34,7 @@ public class Cliente extends Usuario {
         super();
         this.favoritos = new ArrayList<>();
         this.pedidos = new ArrayList<>();
-        this.carrinhoDeCompras = new CarrinhoDeCompras();
+        this.carrinhoDeCompras = new ArrayList<>();
     }
 
     public Cliente(ClienteDTO dto) {
@@ -46,14 +45,14 @@ public class Cliente extends Usuario {
         this.genero = dto.genero();
         this.favoritos = new ArrayList<>();
         this.pedidos = new ArrayList<>();
-        this.carrinhoDeCompras = new CarrinhoDeCompras();
+        this.carrinhoDeCompras = new ArrayList<>();
     }
 
     public Cliente(String username, String encriptedPassword, String role) {
         super(username, encriptedPassword, role);
         this.favoritos = new ArrayList<>();
         this.pedidos = new ArrayList<>();
-        this.carrinhoDeCompras = new CarrinhoDeCompras();
+        this.carrinhoDeCompras = new ArrayList<>();
     }
 
     public Cliente(String username, String email, String password, String nome, String telefone, String endereco,
@@ -65,12 +64,12 @@ public class Cliente extends Usuario {
         this.genero = genero;
         this.favoritos = new ArrayList<>();
         this.pedidos = new ArrayList<>();
-        this.carrinhoDeCompras = new CarrinhoDeCompras();
+        this.carrinhoDeCompras = new ArrayList<>();
     }
 
     public Cliente(String username, String email, String password, String nome, String telefone, String endereco,
                    UserRole role, String sobrenome, String cPF, LocalDate dataNasc, String genero, List<Produto> favoritos,
-                   CarrinhoDeCompras carrinhoDeCompras, List<Pedido> pedidos) {
+                   List<CarrinhoDeCompras> carrinhoDeCompras, List<Pedido> pedidos) {
         super(username, email, password, nome, telefone, endereco, role);
         this.sobrenome = sobrenome;
         cpf = cPF;
@@ -91,14 +90,6 @@ public class Cliente extends Usuario {
         if (!this.favoritos.contains(produto)) {
             this.favoritos.remove(produto);
         }
-    }
-
-    public void adicionarAoCarrinho(Produto produto) {
-        this.carrinhoDeCompras.adicionarItem(produto);
-    }
-
-    public void removerDoCarrinho(Produto produto) {
-        this.carrinhoDeCompras.removerItem(produto);
     }
 
     public String getSobrenome() {
@@ -141,11 +132,11 @@ public class Cliente extends Usuario {
         this.favoritos = favoritos;
     }
 
-    public CarrinhoDeCompras getCarrinhoDeCompras() {
+    public List<CarrinhoDeCompras> getCarrinhoDeCompras() {
         return this.carrinhoDeCompras;
     }
 
-    public void setCarrinhoDeCompras(CarrinhoDeCompras carrinhoDeCompras) {
+    public void setCarrinhoDeCompras(List<CarrinhoDeCompras> carrinhoDeCompras) {
         this.carrinhoDeCompras = carrinhoDeCompras;
     }
 

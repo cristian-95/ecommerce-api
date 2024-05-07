@@ -28,8 +28,7 @@ public class PedidoService {
 
     public Pedido getPedidoById(Long id) throws ResourceNotFoundException {
         try {
-            Pedido pedido = repository.findById(id).get();
-            return pedido;
+            return repository.findById(id).get();
         } catch (Exception e) {
             throw new ResourceNotFoundException("Pedido (id = %d) não encontrado".formatted(id));
         }
@@ -43,7 +42,7 @@ public class PedidoService {
         return repository.save(pedido);
     }
 
-    public void deletePedido(Long id) throws Exception {
+    public void deletePedido(Long id) {
         try {
             Pedido pedido = repository.findById(id).get();
             repository.delete(pedido);

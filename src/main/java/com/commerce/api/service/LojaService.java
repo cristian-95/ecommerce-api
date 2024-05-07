@@ -31,7 +31,7 @@ public class LojaService {
     }
 
     public Loja getLojaById(Long id) throws ResourceNotFoundException {
-        Loja loja = (Loja) repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Loja não encontrada."));
+        Loja loja = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Loja não encontrada."));
         loja.add(linkTo(methodOn(LojaController.class).getAll()).withRel("Listagem"));
         return loja;
     }
@@ -53,9 +53,9 @@ public class LojaService {
         return updated;
     }
 
-    public void deleteLoja(Long id) throws Exception {
+    public void deleteLoja(Long id) {
         try {
-            Loja loja = (Loja) repository.findById(id).get();
+            Loja loja = repository.findById(id).get();
             repository.delete(loja);
         } catch (Exception e) {
             System.err.println("DELETE:Loja: %d não encontrado".formatted(id));
