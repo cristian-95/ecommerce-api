@@ -1,0 +1,6 @@
+services:
+  e-commerce-api-service:
+    image: cristiansantos95/e-commerce-api
+    build: ./api
+    working_dir: /api
+    command: mvn spring-boot:run
