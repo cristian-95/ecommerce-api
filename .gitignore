@@ -1,6 +1,8 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
+./api/HELP.md
+./api/target
+./api/.mvn
+./api/mvnw
+./api/mvnw.cmd
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -32,3 +34,5 @@ build/
 ### VS Code ###
 ./api/vscode/
 ./db
+
+
