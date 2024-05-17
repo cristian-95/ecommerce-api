@@ -68,4 +68,4 @@ jobs:
       #   run: docker push $IMAGE_NAME
 
       - name: Deploy Docker image
-        run: gcloud run deploy site --image $IMAGE_NAME --region us-central1 --memory 128Mi --min-instances 0 --max-instances 1 --platform managed --port 80 --allow-unauthenticated
+        run: gcloud run deploy site --image ${{ secrets.DOCKER_USERNAME }}/e-commerce-api:latest --region us-central1 --port 80 --allow-unauthenticated
