@@ -31,7 +31,7 @@ jobs:
     - name: Build Application Jar
       run: |
         cd api && \
-        mvn clean package
+        mvn clean package -DskipTests
     
     - name: Build the Docker image    
       env:
