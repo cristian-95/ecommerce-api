@@ -59,7 +59,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2.1.0
 
       - name: Build Docker image
-        run: docker build -t $IMAGE_NAME .
+        run: docker build $IMAGE_NAME .
 
       - name: Push Docker image
         run: docker push $IMAGE_NAME
