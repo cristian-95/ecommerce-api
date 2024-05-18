@@ -62,7 +62,7 @@ jobs:
         run: gcloud auth configure-docker --quiet
 
       - name: Build Docker image
-        run: docker build ${{ secrets.DOCKER_USERNAME }}/e-commerce-api:latest
+        run: docker compose -f compose.yaml -f compose-dev.yaml build
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/e-commerce-api:latest
