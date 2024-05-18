@@ -61,11 +61,11 @@ jobs:
       - name: Configure Docker
         run: gcloud auth configure-docker --quiet
 
-      # - name: Build Docker image
-      #   run: docker build $IMAGE_NAME .
+      - name: Build Docker image
+        run: docker build ${{ secrets.DOCKER_USERNAME }}/e-commerce-api:latest
 
-      # - name: Push Docker image
-      #   run: docker push $IMAGE_NAME
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/e-commerce-api:latest
 
       - name: Deploy Docker image
         run: gcloud run deploy site --image ${{ secrets.DOCKER_USERNAME }}/e-commerce-api:latest --region us-central1 --port 80 --allow-unauthenticated
