@@ -44,31 +44,4 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/e-commerce-api:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/e-commerce-api:${{ github.run_number }}
 
-  CD:
-    needs: CI
-    runs-on: ubuntu-latest
-    steps:
 
-      - name: Checkout
-        uses: actions/checkout@v4.1.5
-
-      - name: Login to Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v0.2.0
-        with:
-          service_account_key: ${{ secrets.GCP_CREDENTIALS }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-
-      - name: Set up gcloud Cloud SDK environment
-        uses: google-github-actions/setup-gcloud@v2.1.0
-
-      - name: Configure Docker
-        run: gcloud auth configure-docker --quiet
-
-      - name: Build Docker image
-        run: docker compose -f compose.yaml -f compose-dev.yaml build
-
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/e-commerce-api:latest
-
-      - name: Deploy Docker image
-        run: gcloud run deploy site --image ${{ secrets.DOCKER_USERNAME }}/e-commerce-api:latest --region us-central1 --port 80 --allow-unauthenticated
