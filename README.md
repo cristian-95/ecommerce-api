@@ -13,7 +13,11 @@
     - [x] Mapear exceptions não tratadas (geralmente erros com código 500, com um texto muito grande), e tratar criando
       exceptions customizadas como `ResourceNotFoundException` e tratar elas em  `GlobalExceptionHandler`
 
-- [x] Implementar HATEOAS para que a API seja RESTful (camada de serviço) *[EM PROGRESSO]*
+- [x] Implementar HATEOAS para que a API seja RESTful (camada de serviço) 
+
+- [x] Implementar Paginação
+
+- [ ] Opcional: Implementar registro de multiplos produtos via upload de arquivo JSON
 
 - [ ] Testes
 
