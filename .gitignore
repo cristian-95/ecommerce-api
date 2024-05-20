@@ -5,6 +5,11 @@
 ./api/mvnw.cmd
 !**/src/main/**/target/
 !**/src/test/**/target/
+.mvn
+mvnw
+mvnw.cmd
+.db
+.env
 
 ### STS ###
 .apt_generated
@@ -33,6 +38,7 @@ build/
 
 ### VS Code ###
 ./api/vscode/
+
 ./db
 
 

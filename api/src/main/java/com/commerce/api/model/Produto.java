@@ -2,10 +2,12 @@ package com.commerce.api.model;
 
 import com.commerce.api.model.dto.ProdutoDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -13,6 +15,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "produtos")
+@JsonPropertyOrder({"id", "nome", "descricao", "preco", "especificacoes", "qtdeEstoque"})
+@Relation(collectionRelation = "produtos")
 public class Produto extends RepresentationModel<Produto> implements Serializable {
 
     @Id
@@ -21,7 +25,6 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
 
     @Size(min = 2, max = 80)
     private String nome;
-
     private String descricao;
     private HashMap<String, String> specs;
     private Double preco;
@@ -32,6 +35,10 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
     @JsonIgnore
     @ManyToMany(mappedBy = "favoritos")
     private List<Cliente> clientes;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.REMOVE)
+    private List<Item> itens;
 
     @JsonIgnore
     @ManyToOne
@@ -173,11 +180,8 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
         } else if (!preco.equals(other.preco))
             return false;
         if (qtdeEstoque == null) {
-            if (other.qtdeEstoque != null)
-                return false;
-        } else if (!qtdeEstoque.equals(other.qtdeEstoque))
-            return false;
-        return true;
+            return other.qtdeEstoque == null;
+        } else return qtdeEstoque.equals(other.qtdeEstoque);
     }
 
 

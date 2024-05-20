@@ -1,6 +1,7 @@
 package com.commerce.api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "pedidos")
+@JsonPropertyOrder({"id", "cliente", "loja", "timestamp", "status", "total", "carrinhoDeCompras"})
 public class Pedido implements Serializable {
 
     @Id
@@ -152,10 +154,7 @@ public class Pedido implements Serializable {
         } else if (!status.equals(other.status))
             return false;
         if (carrinhoDeCompras == null) {
-            if (other.carrinhoDeCompras != null)
-                return false;
-        } else if (!carrinhoDeCompras.equals(other.carrinhoDeCompras))
-            return false;
-        return true;
+            return other.carrinhoDeCompras == null;
+        } else return carrinhoDeCompras.equals(other.carrinhoDeCompras);
     }
 }

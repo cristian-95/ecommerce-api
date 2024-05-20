@@ -1,6 +1,8 @@
 package com.commerce.api.model;
 
 import com.commerce.api.model.dto.ClienteDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import org.hibernate.validator.constraints.br.CPF;
 
@@ -11,22 +13,25 @@ import java.util.List;
 @Entity
 @Table(name = "clientes")
 @DiscriminatorValue("Cliente")
+@JsonPropertyOrder({"id", "username", "nome", "sobrenome", "password", "endereco", "email", "telefone", "cpf", "dataNasc", "genero"})
 public class Cliente extends Usuario {
-
-    private String sobrenome;
 
     @CPF
     private String cpf;
     private LocalDate dataNasc;
-
+    private String sobrenome;
     private String genero;
+
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "favoritos", joinColumns = @JoinColumn(name = "cliente_id"), inverseJoinColumns = @JoinColumn(name = "produto_id"))
     private List<Produto> favoritos;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cliente")
     private List<CarrinhoDeCompras> carrinhoDeCompras;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cliente")
     private List<Pedido> pedidos;
 
@@ -87,9 +92,7 @@ public class Cliente extends Usuario {
     }
 
     public void removerFavorito(Produto produto) {
-        if (!this.favoritos.contains(produto)) {
-            this.favoritos.remove(produto);
-        }
+        this.favoritos.remove(produto);
     }
 
     public String getSobrenome() {
@@ -202,11 +205,11 @@ public class Cliente extends Usuario {
         } else if (!carrinhoDeCompras.equals(other.carrinhoDeCompras))
             return false;
         if (pedidos == null) {
-            if (other.pedidos != null)
-                return false;
-        } else if (!pedidos.equals(other.pedidos))
-            return false;
-        return true;
+            return other.pedidos == null;
+        } else return pedidos.equals(other.pedidos);
     }
 
+    public void novoCarrinho() {
+        this.carrinhoDeCompras.add(0, new CarrinhoDeCompras(this));
+    }
 }

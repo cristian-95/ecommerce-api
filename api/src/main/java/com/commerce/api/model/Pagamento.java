@@ -34,20 +34,20 @@ public class Pagamento implements Serializable {
         return idPagamento;
     }
 
-    public String getMetodoPagamento() {
-        return metodoPagamento;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
     public void setIdPagamento(Long idPagamento) {
         this.idPagamento = idPagamento;
     }
 
+    public String getMetodoPagamento() {
+        return metodoPagamento;
+    }
+
     public void setMetodoPagamento(String metodoPagamento) {
         this.metodoPagamento = metodoPagamento;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
@@ -84,10 +84,7 @@ public class Pagamento implements Serializable {
         } else if (!metodoPagamento.equals(other.metodoPagamento))
             return false;
         if (status == null) {
-            if (other.status != null)
-                return false;
-        } else if (!status.equals(other.status))
-            return false;
-        return true;
+            return other.status == null;
+        } else return status.equals(other.status);
     }
 } 

@@ -10,6 +10,8 @@ import com.commerce.api.model.dto.RegisterDTO;
 import com.commerce.api.repository.ClienteRepository;
 import com.commerce.api.repository.LojaRepository;
 import com.commerce.api.security.TokenService;
+import com.commerce.api.service.ClienteService;
+import com.commerce.api.service.LojaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -41,6 +43,10 @@ public class AuthenticationController {
     private LojaRepository lojaRepository;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private ClienteService clienteService;
+    @Autowired
+    private LojaService lojaService;
 
     @SuppressWarnings("rawtypes")
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -77,24 +83,22 @@ public class AuthenticationController {
     })
     public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
         Usuario user;
-        String encriptedPassword = "";
-        switch (UserRole.valueOf(data.role())) {
-            case USER:
-                if (this.clienteRepository.findByUsername(data.username()) != null)
-                    return ResponseEntity.badRequest().build();
+        String encriptedPassword;
+        if (UserRole.valueOf(data.role().toUpperCase()) == UserRole.USER) {
+            if (this.clienteRepository.findByUsername(data.username()) != null)
+                return ResponseEntity.badRequest().build();
 
-                encriptedPassword = new BCryptPasswordEncoder().encode(data.password());
-                Cliente newCliente = new Cliente(data.username(), encriptedPassword, data.role().toUpperCase());
-                this.clienteRepository.save(newCliente);
-                break;
-            default:
-                if (this.lojaRepository.findByUsername(data.username()) != null)
-                    return ResponseEntity.badRequest().build();
+            encriptedPassword = new BCryptPasswordEncoder().encode(data.password());
+            Cliente newCliente = new Cliente(data.username(), encriptedPassword, data.role().toUpperCase());
+            user = clienteService.createNewClienteAccount(newCliente);
+        } else {
+            if (this.lojaRepository.findByUsername(data.username()) != null)
+                return ResponseEntity.badRequest().build();
 
-                encriptedPassword = new BCryptPasswordEncoder().encode(data.password());
-                Loja newLoja = new Loja(data.username(), encriptedPassword, data.role().toUpperCase());
-                this.lojaRepository.save(newLoja);
+            encriptedPassword = new BCryptPasswordEncoder().encode(data.password());
+            Loja newLoja = new Loja(data.username(), encriptedPassword, data.role().toUpperCase());
+            user = lojaService.createNewLojaAccount(newLoja);
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(user);
     }
 }

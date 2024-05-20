@@ -312,10 +312,7 @@ public class Usuario extends RepresentationModel<Usuario> implements UserDetails
         } else if (!accountNonExpired.equals(other.accountNonExpired))
             return false;
         if (credentialsNonExpired == null) {
-            if (other.credentialsNonExpired != null)
-                return false;
-        } else if (!credentialsNonExpired.equals(other.credentialsNonExpired))
-            return false;
-        return true;
+            return other.credentialsNonExpired == null;
+        } else return credentialsNonExpired.equals(other.credentialsNonExpired);
     }
 }

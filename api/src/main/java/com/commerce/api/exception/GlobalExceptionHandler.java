@@ -34,7 +34,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         List<ErrorMessage> errorList = new ArrayList<>();
 
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            String msg = fieldError.getField() + ": " + fieldError.getDefaultMessage();
+            String msg = "Erro de validação: " + fieldError.getDefaultMessage();
             errorList.add(new ErrorMessage(msg, 400));
         }
         return errorList;

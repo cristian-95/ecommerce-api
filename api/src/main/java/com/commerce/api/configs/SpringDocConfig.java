@@ -16,8 +16,18 @@ public class SpringDocConfig {
                         .title("E-commerce API")
                         .version("1.0.0")
                         .description("""
-                                    Api Rest para o gerenciamento de uma plataforma de ecommerce.
-                                    Grupo: Cristian, Edu, José e Sergio
+                                    API RESTful para o gerenciamento de uma plataforma de e-commerce.
+                                    
+                                    Curso: Bacharelado em Ciência da Computação
+                                    Disciplina: Desenvolvimento para Web
+                                    Professor: Davi Duarte de Paula
+                                    
+                                    Grupo:
+                                    Cristian Santos de Castro
+                                    Edu Teodoro Batista
+                                    José Zumbini Neto
+                                    Sergio Paulo Guerrato Alves
+                                     
                                 """)
                         .license(
                                 new License()
