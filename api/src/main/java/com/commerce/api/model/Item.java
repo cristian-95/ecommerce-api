@@ -1,6 +1,8 @@
 package com.commerce.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -16,6 +18,7 @@ public class Item {
 
     @ManyToOne
     @JoinColumn(name = "produto_id")
+    @JsonIncludeProperties({"id","nome","preco", "_links"})
     private Produto produto;
 
     @Min(0)

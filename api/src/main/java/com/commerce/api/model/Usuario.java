@@ -4,6 +4,7 @@ import com.commerce.api.model.dto.ClienteDTO;
 import com.commerce.api.model.dto.LojaDTO;
 import com.commerce.api.validation.constraints.Telefone;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import org.springframework.hateoas.RepresentationModel;
@@ -18,6 +19,7 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @DiscriminatorColumn(name = "Usuario_Type")
 @Table(name = "usuarios")
+@JsonIgnoreProperties({"authorities"})
 public class Usuario extends RepresentationModel<Usuario> implements UserDetails {
 
     @Id

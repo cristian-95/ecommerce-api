@@ -1,6 +1,7 @@
 package com.commerce.api.model;
 
 import com.commerce.api.model.dto.ClienteDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
@@ -18,6 +19,7 @@ public class Cliente extends Usuario {
 
     @CPF
     private String cpf;
+    @JsonFormat(pattern="dd/MM/yyyy")
     private LocalDate dataNasc;
     private String sobrenome;
     private String genero;

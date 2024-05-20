@@ -4,7 +4,9 @@ server:
 spring:
   application:
     name: e-commerce-api
-
+  jackson:
+    serialization:
+      write_dates_as_timestamps: true
   # Configurações do Postgres:
   datasource:
     url: jdbc:postgresql://${DB_SERVICE:localhost}:5432/e_commerce_api_db

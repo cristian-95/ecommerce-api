@@ -1,6 +1,7 @@
 package com.commerce.api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "pedidos")
-@JsonPropertyOrder({"id", "cliente", "loja", "timestamp", "status", "total", "carrinhoDeCompras"})
+@JsonPropertyOrder({"id", "status","cliente", "loja", "timestamp", "total", "carrinhoDeCompras"})
 public class Pedido implements Serializable {
 
     @Id
@@ -26,6 +27,7 @@ public class Pedido implements Serializable {
     @JsonBackReference
     private Loja loja;
 
+    @JsonFormat(pattern="dd/MM/yyyy HH:mm",timezone="GMT-3")
     private LocalDateTime timestamp;
     private PedidoStatus status;
 

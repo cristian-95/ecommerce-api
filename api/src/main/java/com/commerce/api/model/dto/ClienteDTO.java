@@ -1,6 +1,7 @@
 package com.commerce.api.model.dto;
 
 import com.commerce.api.validation.constraints.Telefone;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import org.hibernate.validator.constraints.br.CPF;
@@ -22,6 +23,7 @@ public record ClienteDTO(
         String sobrenome,
         @CPF
         String CPF,
+        @JsonFormat(pattern="dd/MM/yyyy")
         LocalDate dataNasc,
         String genero
 ) {

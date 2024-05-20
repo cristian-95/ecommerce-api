@@ -2,6 +2,7 @@ package com.commerce.api.model;
 
 import com.commerce.api.model.dto.ProdutoDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -40,7 +41,8 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
     @OneToMany(mappedBy = "produto", cascade = CascadeType.REMOVE)
     private List<Item> itens;
 
-    @JsonIgnore
+
+    @JsonIncludeProperties({"id", "nome"})
     @ManyToOne
     @JoinColumn(name = "loja_id")
     private Loja loja;
