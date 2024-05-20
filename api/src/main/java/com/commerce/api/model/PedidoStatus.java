@@ -2,11 +2,11 @@ package com.commerce.api.model;
 
 public enum PedidoStatus {
     PENDENTE("pendente"),
-    EM_PROGRESSO("em progresso"),
+    EM_PROGRESSO("em_progresso"),
     CONCLUIDO("concluido"),
     CANCELADO("cancelado");
 
-    private String status;
+    private final String status;
 
     PedidoStatus(String status) {
         this.status = status;
