@@ -7,6 +7,12 @@ import com.commerce.api.model.dto.ProdutoDTO;
 import com.commerce.api.repository.ProdutoRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,17 +24,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ProdutoService {
 
     @Autowired
+    PagedResourcesAssembler<Produto> assembler;
+    @Autowired
     private ProdutoRepository produtoRepository;
 
-    public List<Produto> getAllProdutos() {
-        List<Produto> produtos = produtoRepository.findAll();
+    public PagedModel<EntityModel<Produto>> getAllProdutos(Pageable pageable) {
+        Page<Produto> produtos = produtoRepository.findAll(pageable);
         produtos.forEach(p -> p.add(linkTo(methodOn(ProdutoController.class).getById(p.getId())).withSelfRel()));
-        return produtos;
+        return assembler.toModel(produtos);
     }
 
     public Produto getProdutoById(Long id) throws ResourceNotFoundException {
         Produto produto = produtoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
-        produto.add(linkTo(methodOn(ProdutoController.class).getAll()).withRel("Listagem"));
+        produto.add(linkTo(methodOn(ProdutoController.class).getAll(0, 0, "")).withRel("Listagem"));
         return produto;
     }
 
@@ -61,10 +69,11 @@ public class ProdutoService {
         }
     }
 
-    public List<Produto> getAllProdutosByLojaId(Long lojaId) {
+    public PagedModel<EntityModel<Produto>> getAllProdutosByLojaId(Long lojaId) {
         List<Produto> produtos = produtoRepository.findByLojaId(lojaId);
         produtos.forEach(p -> p.add(linkTo(methodOn(ProdutoController.class).getById(p.getId())).withSelfRel()));
-        return produtos;
+        Page<Produto> page = new PageImpl<>(produtos);
+        return assembler.toModel(page);
     }
 
     private Produto updateProperties(Produto produto, ProdutoDTO dto) {

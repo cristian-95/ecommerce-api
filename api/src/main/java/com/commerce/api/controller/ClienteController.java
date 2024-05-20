@@ -7,7 +7,7 @@ import com.commerce.api.model.Pedido;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ClienteDTO;
 import com.commerce.api.model.dto.ClienteUpdateDTO;
-import com.commerce.api.service.CarrinhoService;
+import com.commerce.api.service.CarrinhoDeComprasService;
 import com.commerce.api.service.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -17,6 +17,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +37,7 @@ public class ClienteController {
     @Autowired
     private ClienteService service;
     @Autowired
-    private CarrinhoService carrinhoService;
+    private CarrinhoDeComprasService carrinhoDeComprasService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Lista todos os clientes", description = "Consulta o banco de dados e retorna todos os clientes.", tags = {
@@ -44,8 +49,14 @@ public class ClienteController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<List<Cliente>> getAll() {
-        return ResponseEntity.ok(service.getAllClientes());
+    public ResponseEntity<PagedModel<EntityModel<Cliente>>> getAll(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction
+    ) {
+        var sortDirection = "DESC".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "nome"));
+        return ResponseEntity.ok(service.getAllClientes(pageable));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
