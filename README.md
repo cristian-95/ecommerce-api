@@ -1,4 +1,4 @@
-# ecommerce-api
+# e-commerce-api
 
 ## TO-DO:
 
