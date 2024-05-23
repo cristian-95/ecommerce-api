@@ -6,8 +6,8 @@ services:
     restart: always
     environment:
       POSTGRES_DB: e_commerce_api_db
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
       TZ: America/Sao_Paulo
     ports:
       - 5432:5432
@@ -21,8 +21,8 @@ services:
     restart: always
     environment:
       SPRING.DATASOURCE.URL: jdbc:postgresql://db-service:5432/e_commerce_api_db
-      SPRING.DATASOURCE.USERNAME: ${DB_USERNAME}
-      SPRING.DATASOURCE.PASSWORD: ${DB_PASSWORD}
+      SPRING.DATASOURCE.USERNAME: postgres
+      SPRING.DATASOURCE.PASSWORD: password
       E-COMMERCE-API.SECURITY.TOKEN.SECRET: ${API_SECRET}
       TZ: America/Sao_Paulo
     ports:

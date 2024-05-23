@@ -22,7 +22,7 @@ spring:
 e-commerce-api:
   security:
     token:
-      secret: ${API_SECRET}
+      secret: ${API_SECRET:secret-text}
 
 # Configurações do SpringDoc:
 springdoc:
