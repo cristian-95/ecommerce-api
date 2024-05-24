@@ -6,7 +6,7 @@ services:
     build: ./api
     working_dir: /api
     environment:
-      SPRING.DATASOURCE.URL: jdbc:postgresql://db-service:5433/e_commerce_api_db
+      SPRING.DATASOURCE.URL: jdbc:postgresql://db-service:5432/e_commerce_api_db
       SPRING.DATASOURCE.USERNAME: postgres
       SPRING.DATASOURCE.PASSWORD: admin123
     ports:

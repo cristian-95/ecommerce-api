@@ -11,12 +11,11 @@ services:
       POSTGRES_TCP_PORT: 5433
       TZ: America/Sao_Paulo
     ports:
-      - 5433:5433
+      - 5432:5432
     expose:
-      - 5433
+      - 5432
     networks:
       - e-commerce-api-network
-    command: -p 5433
 
   e-commerce-api-service:
     image: cristiansantos95/e-commerce-api
@@ -24,7 +23,7 @@ services:
       - db-service
     restart: always
     environment:
-      SPRING.DATASOURCE.URL: jdbc:postgresql://db-service:5433/e_commerce_api_db
+      SPRING.DATASOURCE.URL: jdbc:postgresql://db-service:5432/e_commerce_api_db
       SPRING.DATASOURCE.USERNAME: postgres
       SPRING.DATASOURCE.PASSWORD: postgres
       E-COMMERCE-API.SECURITY.TOKEN.SECRET: text
