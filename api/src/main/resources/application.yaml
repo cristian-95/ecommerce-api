@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 80
 
 spring:
   application:
@@ -9,9 +9,9 @@ spring:
       write_dates_as_timestamps: true
   # Configurações do Postgres:
   datasource:
-    url: jdbc:postgresql://db-service:5432/e_commerce_api_db
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5433/e_commerce_api_db
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     open-in-view: true
