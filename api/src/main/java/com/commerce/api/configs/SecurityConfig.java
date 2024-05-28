@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, "/produtos**").hasAnyRole(new String[]{"USER", "MANAGER"})
+                        .requestMatchers(HttpMethod.GET, "/produtos**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/produtos**").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.PUT, "/produtos**").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.DELETE, "/produtos**").hasRole("MANAGER")
@@ -54,7 +54,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.DELETE, "/lojas*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/lojas").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/lojas**").hasAnyRole(new String[]{"USER", "MANAGER"})
+                        .requestMatchers(HttpMethod.GET, "/lojas**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/lojas**").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.GET, "/lojas/{id}/produtos").hasAnyRole(new String[]{"USER", "MANAGER"})
                         .requestMatchers(HttpMethod.POST, "/lojas/{id}/produtos").hasRole("MANAGER")
@@ -81,11 +81,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:3000**"));
+        configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Access-Control-Allow-Headers", "Access-Control-Allow-Origin"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

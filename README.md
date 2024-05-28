@@ -2,30 +2,13 @@
 
 ## TO-DO:
 
-- [X] Implementar classes da camada de modelo
-    - [X]  Implementar relacionamentos e cardinalidade
-
-- [X] Documentação com OpenApi seguindo o exemplo em `ProdutoController`:
-    - [X] Ao final, criar uma Collection a partir da documentação, expórtar em arquivo .json e
-      substituir `ecommerce-api.postman_collection`
-
-- [x] Tratamento correto de exceções *[EM PROGRESSO]*
-    - [x] Mapear exceptions não tratadas (geralmente erros com código 500, com um texto muito grande), e tratar criando
-      exceptions customizadas como `ResourceNotFoundException` e tratar elas em  `GlobalExceptionHandler`
-
-- [x] Implementar HATEOAS para que a API seja RESTful (camada de serviço)
-
-- [x] Implementar Paginação
+- [ ] **Testes**
 
 - [ ] Opcional: Implementar registro de multiplos produtos via upload de arquivo JSON
 
-- [ ] Testes
-
 - [x] Configurar permissões aos endpoints
 
-- [ ] Atualizar diagram UML
-
-- [ ] Caso encontrar outra tarefa adicione nesta lista.
+- [ ] Atualizar diagrama UML
 
 ## Diagrama de classes UML
 
