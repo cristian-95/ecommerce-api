@@ -1,51 +1,74 @@
 package com.commerce.api.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.commerce.api.utils.GeradorPedidoCodigo;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "pedidos")
-@JsonPropertyOrder({"id", "status","cliente", "loja", "timestamp", "total", "carrinhoDeCompras"})
+@JsonPropertyOrder({"codigo", "status", "timestamp", "cliente", "loja", "total", "itens"})
 public class Pedido implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonIgnore
     private Long id;
+
+    @Column(unique = true)
+    private String codigo;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
-    @JsonBackReference
+    @JsonIncludeProperties({"nome", "sobrenome"})
     private Cliente cliente;
 
     @ManyToOne
     @JoinColumn(name = "loja_id")
-    @JsonBackReference
+    @JsonIncludeProperties({"nome"})
     private Loja loja;
 
-    @JsonFormat(pattern="dd/MM/yyyy HH:mm",timezone="GMT-3")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "GMT-3")
     private LocalDateTime timestamp;
     private PedidoStatus status;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "carrinho_id", referencedColumnName = "id")
-    private CarrinhoDeCompras carrinhoDeCompras;
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    @JsonIncludeProperties({"produto", "quantidade"})
+    private List<Item> itens;
+
+    @Column
     private Double total;
 
     public Pedido() {
+        this.codigo = GeradorPedidoCodigo.novoCodigo();
+        this.timestamp = LocalDateTime.now();
+        this.status = PedidoStatus.PENDENTE;
     }
 
-    public Pedido(Cliente cliente, Loja loja, PedidoStatus status, CarrinhoDeCompras carrinhoDeCompras) {
+    public Pedido(Cliente cliente, Loja loja, List<Item> itens) {
+        this.codigo = GeradorPedidoCodigo.novoCodigo();
         this.cliente = cliente;
         this.loja = loja;
         this.timestamp = LocalDateTime.now();
-        this.status = status;
-        this.carrinhoDeCompras = carrinhoDeCompras;
-        this.total = carrinhoDeCompras.getTotal();
+        this.status = PedidoStatus.PENDENTE;
+
+        this.itens = itens;
+        this.total = atualizarTotal();
+    }
+
+    public Double atualizarTotal() {
+        Double res = 0.0;
+        for (Item i : itens) {
+            res += i.getProduto().getPreco() * i.getQuantidade();
+        }
+        return res;
     }
 
     public Long getId() {
@@ -92,12 +115,12 @@ public class Pedido implements Serializable {
         this.status = PedidoStatus.valueOf(status);
     }
 
-    public CarrinhoDeCompras getCarrinho() {
-        return carrinhoDeCompras;
+    public List<Item> getItens() {
+        return this.itens;
     }
 
-    public void setCarrinho(CarrinhoDeCompras carrinhoDeCompras) {
-        this.carrinhoDeCompras = carrinhoDeCompras;
+    public void setItens(List<Item> itens) {
+        this.itens = itens;
     }
 
     public Double getTotal() {
@@ -108,55 +131,23 @@ public class Pedido implements Serializable {
         this.total = total;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((cliente == null) ? 0 : cliente.hashCode());
-        result = prime * result + ((loja == null) ? 0 : loja.hashCode());
-        result = prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
-        result = prime * result + ((status == null) ? 0 : status.hashCode());
-        result = prime * result + ((carrinhoDeCompras == null) ? 0 : carrinhoDeCompras.hashCode());
-        return result;
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Pedido other = (Pedido) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (cliente == null) {
-            if (other.cliente != null)
-                return false;
-        } else if (!cliente.equals(other.cliente))
-            return false;
-        if (loja == null) {
-            if (other.loja != null)
-                return false;
-        } else if (!loja.equals(other.loja))
-            return false;
-        if (timestamp == null) {
-            if (other.timestamp != null)
-                return false;
-        } else if (!timestamp.equals(other.timestamp))
-            return false;
-        if (status == null) {
-            if (other.status != null)
-                return false;
-        } else if (!status.equals(other.status))
-            return false;
-        if (carrinhoDeCompras == null) {
-            return other.carrinhoDeCompras == null;
-        } else return carrinhoDeCompras.equals(other.carrinhoDeCompras);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Pedido pedido)) return false;
+        return Objects.equals(id, pedido.id) && Objects.equals(codigo, pedido.codigo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, codigo);
     }
 }

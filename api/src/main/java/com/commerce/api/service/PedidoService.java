@@ -2,59 +2,133 @@ package com.commerce.api.service;
 
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.*;
-import com.commerce.api.model.dto.PedidoDTO;
 import com.commerce.api.model.dto.PedidoUpdateDTO;
+import com.commerce.api.repository.ItemRepository;
 import com.commerce.api.repository.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
 
     @Autowired
-    private PedidoRepository repository;
+    private PedidoRepository pedidoRepository;
     @Autowired
     private CarrinhoDeComprasService carrinhoDeComprasService;
     @Autowired
     private LojaService lojaService;
     @Autowired
     private ClienteService clienteService;
+    @Autowired
+    private ItemRepository itemRepository;
 
 
-    public List<Pedido> getAllPedidos() {
-        return this.repository.findAll();
+    public List<Pedido> getAllPedidos(String username) {
+        List<Pedido> pedidos;
+        if (clienteService.getProfile(username) != null) {
+            Cliente cliente = clienteService.getProfile(username);
+            pedidos = this.pedidoRepository.findAllByCliente(cliente);
+        } else {
+            Loja loja = lojaService.getProfile(username);
+            pedidos = this.pedidoRepository.findAllByLoja(loja);
+        }
+        Collections.reverse(pedidos);
+        return pedidos;
+    }
+
+    public Pedido getPedido(String username) {
+        if (clienteService.getProfile(username) != null) {
+            Cliente cliente = clienteService.getProfile(username);
+            return this.pedidoRepository.findByCliente(cliente);
+        } else {
+            Loja loja = lojaService.getProfile(username);
+            return this.pedidoRepository.findByLoja(loja);
+        }
+    }
+
+    public Pedido getPedidoByCodigo(String codigo) {
+        return pedidoRepository.findByCodigo(codigo);
     }
 
     public Pedido getPedidoById(Long id) throws ResourceNotFoundException {
-        return this.repository.findById(id).orElseThrow();
+        return this.pedidoRepository.findById(id).orElseThrow();
     }
 
-    public Pedido createPedido(PedidoDTO dto) throws ResourceNotFoundException {
-        CarrinhoDeCompras carrinho = this.carrinhoDeComprasService.getCarrinhoDeComprasById(dto.carrinhoId());
-        Loja loja = this.lojaService.getLojaById(dto.lojaId());
-        Cliente cliente = this.clienteService.getClienteById(dto.clienteId());
-        cliente.novoCarrinho();
-        Pedido pedido = new Pedido(cliente, loja, PedidoStatus.PENDENTE, carrinho);
-        this.carrinhoDeComprasService.save(carrinho);
+    public List<Pedido> processarPedidos(String username) throws ResourceNotFoundException {
+
+        Cliente cliente = this.clienteService.getProfile(username);
+        CarrinhoDeCompras carrinhoDeCompras = cliente.getCarrinhoDeCompras().get(0);
+        Map<Loja, List<Item>> itensPorLoja = agruparItensPorLoja(carrinhoDeCompras.getItens());
+
+        List<Pedido> pedidos = new ArrayList<>();
+        for (Map.Entry<Loja, List<Item>> entry : itensPorLoja.entrySet()) {
+            Loja loja = entry.getKey();
+            List<Item> itens = entry.getValue();
+
+            Pedido pedido = new Pedido(cliente, loja, itens);
+            salvarPedido(pedido, cliente, loja);
+            pedidos.add(pedido);
+        }
+        CarrinhoDeCompras novoCarrinho = new CarrinhoDeCompras(cliente);
+        criarCarrinhoNovo(carrinhoDeCompras, novoCarrinho, cliente);
+        removerCarrinhoAntigo(carrinhoDeCompras);
+
         this.clienteService.save(cliente);
-        return this.repository.save(pedido);
+        return pedidos;
     }
 
-    public Pedido updatePedido(Long id, PedidoUpdateDTO dto) throws IllegalArgumentException {
-        Pedido pedido = getPedidoById(id);
+    public Pedido updatePedido(String username, PedidoUpdateDTO dto) throws IllegalArgumentException {
+        Loja loja = lojaService.getProfile(username);
+        Pedido pedido = getPedidoByCodigo(dto.codigo());
+        if (!loja.equals(pedido.getLoja())) {
+            return null;
+        }
         PedidoStatus status = PedidoStatus.valueOf(dto.status().toUpperCase());
         pedido.setStatus(status);
-        return this.repository.save(pedido);
+        return this.pedidoRepository.save(pedido);
     }
 
     public void deletePedido(Long id) {
         try {
-            Pedido pedido = this.repository.findById(id).get();
-            this.repository.delete(pedido);
+            Pedido pedido = this.pedidoRepository.findById(id).get();
+            this.pedidoRepository.delete(pedido);
         } catch (Exception e) {
             throw new ResourceNotFoundException("Pedido (id = %d) não encontrado".formatted(id));
         }
+    }
+
+    private Map<Loja, List<Item>> agruparItensPorLoja(List<Item> itens) {
+        return itens.stream()
+                .collect(Collectors.groupingBy(i -> i.getProduto().getLoja()));
+    }
+
+    private void salvarPedido(Pedido pedido, Cliente cliente, Loja loja) {
+        cliente.adicionarPedido(pedido);
+        loja.adicionarPedido(pedido);
+
+        this.pedidoRepository.save(pedido);
+        List<Item> itens = pedido.getItens();
+        itens.forEach(i -> {
+            i.setPedido(pedido);
+            itemRepository.save(i);
+        });
+
+        this.lojaService.save(loja);
+    }
+
+    private void removerCarrinhoAntigo(CarrinhoDeCompras carrinho) {
+        this.carrinhoDeComprasService.remover(carrinho);
+    }
+
+    private void criarCarrinhoNovo(CarrinhoDeCompras carrinhoDeCompras, CarrinhoDeCompras novoCarrinho, Cliente cliente) {
+        this.carrinhoDeComprasService.create(novoCarrinho);
+        cliente.getCarrinhoDeCompras().add(0, novoCarrinho);
+        cliente.getCarrinhoDeCompras().remove(carrinhoDeCompras);
     }
 }

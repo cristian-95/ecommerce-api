@@ -2,8 +2,9 @@ package com.commerce.api.controller;
 
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Pedido;
-import com.commerce.api.model.dto.PedidoDTO;
+import com.commerce.api.model.dto.PedidoResponseDTO;
 import com.commerce.api.model.dto.PedidoUpdateDTO;
+import com.commerce.api.security.TokenService;
 import com.commerce.api.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -26,10 +27,12 @@ import java.util.List;
 public class PedidoController {
 
     @Autowired
-    private PedidoService service;
+    private PedidoService pedidoService;
+    @Autowired
+    private TokenService tokenService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Lista todos os pedidos", description = "Consulta o banco de dados e retorna todos os pedidos.", tags = {
+    @Operation(summary = "Lista todos os pedidos do perfil", description = "Consulta o banco de dados e retorna todos os pedidos do perfil.", tags = {
             "Pedidos"}, responses = {
             @ApiResponse(description = "Success", responseCode = "200",
                     content = @Content(
@@ -42,12 +45,13 @@ public class PedidoController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<List<Pedido>> getAll() {
-        return ResponseEntity.ok(service.getAllPedidos());
+    public ResponseEntity<List<Pedido>> getAll(@RequestHeader("Authorization") String token) {
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(pedidoService.getAllPedidos(username));
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Exibe um pedido", description = "Consulta o banco de dados e retorna um determinado pedido, a partir do número de id passado na URI.", tags = {
+    @GetMapping(value = "/{codigo}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Exibe um pedido", description = "Consulta o banco de dados e retorna um determinado pedido, a partir do codigo.", tags = {
             "Pedidos"}, responses = {
             @ApiResponse(description = "Success", responseCode = "200",
                     content = @Content(
@@ -60,15 +64,12 @@ public class PedidoController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<?> getById(@PathVariable("id") Long id) throws ResourceNotFoundException {
-        Pedido pedido = service.getPedidoById(id);
-        if (pedido == null)
-            return new ResponseEntity<>("Pedido não encontrado.", HttpStatus.NOT_FOUND);
-        return ResponseEntity.ok(pedido);
+    public ResponseEntity<Pedido> getByCodigo(@PathVariable("codigo") String codigo) throws ResourceNotFoundException {
+        return ResponseEntity.ok(this.pedidoService.getPedidoByCodigo(codigo));
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Registra um pedido", description = "Instancia um novo objeto do tipo Pedido e salva no banco de dados, a propriedade loja permanece nula inicialmente.", tags = {
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Processa pedidos", description = "Itera os itens no carrinho e gera pedidos para cada loja.", tags = {
             "Pedidos"}, responses = {
             @ApiResponse(description = "Created", responseCode = "201",
                     content = @Content(
@@ -80,8 +81,9 @@ public class PedidoController {
             @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Pedido> create(@RequestBody PedidoDTO dto) throws ResourceNotFoundException {
-        return new ResponseEntity<>(service.createPedido(dto), HttpStatus.CREATED);
+    public ResponseEntity<?> processarPedidos(@RequestHeader("Authorization") String token) throws ResourceNotFoundException {
+        String username = tokenService.getUsernameFromToken(token);
+        return new ResponseEntity<>(pedidoService.processarPedidos(username), HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -97,8 +99,9 @@ public class PedidoController {
             @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Pedido> update(@PathVariable("id") Long id, @Valid @RequestBody PedidoUpdateDTO dto) throws IllegalArgumentException {
-        return new ResponseEntity<>(service.updatePedido(id, dto), HttpStatus.CREATED);
+    public ResponseEntity<Pedido> update(@RequestHeader("Authorization") String token, @Valid @RequestBody PedidoUpdateDTO dto) throws IllegalArgumentException {
+        String username = tokenService.getUsernameFromToken(token);
+        return new ResponseEntity<>(pedidoService.updatePedido(username, dto), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/{id}")
@@ -116,7 +119,7 @@ public class PedidoController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws Exception {
-        service.deletePedido(id);
+        pedidoService.deletePedido(id);
         return ResponseEntity.noContent().build();
     }
 }
