@@ -1,7 +1,6 @@
 package com.commerce.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
@@ -18,7 +17,7 @@ public class Item {
 
     @ManyToOne
     @JoinColumn(name = "produto_id")
-    @JsonIncludeProperties({"id","nome","preco", "_links"})
+    @JsonIncludeProperties({"id", "nome", "preco", "_links"})
     private Produto produto;
 
     @Min(0)
@@ -28,6 +27,9 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "carrinho_de_compras_id")
     private CarrinhoDeCompras carrinhoDeCompras;
+
+    @ManyToOne(targetEntity = Pedido.class)
+    private Pedido pedido;
 
     public Item() {
     }
@@ -82,7 +84,27 @@ public class Item {
         return carrinhoDeCompras;
     }
 
+
     public void setCarrinhoDeCompras(CarrinhoDeCompras carrinhoDeCompras) {
         this.carrinhoDeCompras = carrinhoDeCompras;
+    }
+
+    public Pedido getPedido() {
+        return pedido;
+    }
+
+    public void setPedido(Pedido pedido) {
+        this.pedido = pedido;
+    }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", produto=" + produto +
+                ", quantidade=" + quantidade +
+                ", carrinhoDeCompras=" + carrinhoDeCompras +
+                ", pedido=" + pedido +
+                '}';
     }
 }

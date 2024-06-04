@@ -40,8 +40,13 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException exception) {
-            return "";
+            throw new JWTVerificationException("Token invalido");
         }
+    }
+
+    public String getUsernameFromToken(String token) {
+        token = token.replace("Bearer ", "");
+        return this.validateToken(token);
     }
 
     private Instant genExpirationDate() {

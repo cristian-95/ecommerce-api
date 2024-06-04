@@ -37,43 +37,42 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, "/produtos**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/produtos**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.PUT, "/produtos**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.DELETE, "/produtos**").hasRole("MANAGER")
-
-                        .requestMatchers(HttpMethod.GET, "/clientes").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/clientes**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/clientes**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/clientes/{id}").hasRole("USER")
-                        .requestMatchers(HttpMethod.PUT, "/clientes/{id}").hasRole("USER")
-                        .requestMatchers("/clientes/{id}/carrinho").hasRole("USER")
-                        .requestMatchers("/clientes/{id}/favoritos").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET, "/clientes/{id}/pedidos").hasRole("USER")
-
-                        .requestMatchers(HttpMethod.DELETE, "/lojas*").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/lojas").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/lojas**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/lojas**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.GET, "/lojas/{id}/produtos").hasAnyRole(new String[]{"USER", "MANAGER"})
-                        .requestMatchers(HttpMethod.POST, "/lojas/{id}/produtos").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.DELETE, "/lojas/{id}/produtos").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.GET, "/lojas/{id}/pedidos").hasRole("MANAGER")
-
-
-                        .requestMatchers(HttpMethod.POST, "/pedidos").hasAnyRole(new String[]{"USER", "MANAGER"})
-                        .requestMatchers("/pedidos/{id}").hasRole("ADMIN")
-                        .requestMatchers("/pedidos").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/pedidos/{id}").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.PATCH, "/pedidos/{id}").hasRole("MANAGER")
-
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(
+                        authorize -> authorize
+                                /* Endpoints de produtos: */
+                                .requestMatchers(HttpMethod.GET, "/produtos**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/produtos").hasRole("MANAGER")
+                                .requestMatchers(HttpMethod.PUT, "/produtos").hasRole("MANAGER")
+                                .requestMatchers(HttpMethod.DELETE, "/produtos/{id}").hasRole("MANAGER")
+                                /* Endpoints de clientes: */
+                                .requestMatchers("/clientes/carrinho").hasRole("USER")
+                                .requestMatchers("/clientes/favoritos").hasRole("USER")
+                                .requestMatchers(HttpMethod.GET, "/clientes/profile").hasRole("USER")
+                                .requestMatchers(HttpMethod.PUT, "/clientes/profile").hasRole("USER")
+                                .requestMatchers(HttpMethod.GET, "/clientes/pedidos").hasRole("USER")
+                                .requestMatchers(HttpMethod.POST, "/clientes").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/clientes**").hasRole("ADMIN")
+                                /* Endpoints de pedidos: */
+                                .requestMatchers(HttpMethod.POST, "/pedidos").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/pedidos").hasRole("USER")
+                                .requestMatchers(HttpMethod.GET, "/pedidos/{codigo}").hasRole("USER")
+                                .requestMatchers(HttpMethod.PATCH, "/pedidos/{codigo}").hasRole("MANAGER")
+                                .requestMatchers(HttpMethod.DELETE, "/pedidos/{codigo}").hasRole("ADMIN")
+                                /* Endpoints de lojas: */
+                                .requestMatchers(HttpMethod.GET, "/lojas**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/lojas/profile").hasRole("MANAGER")
+                                .requestMatchers(HttpMethod.DELETE, "/lojas*").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/lojas").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/lojas**").hasRole("MANAGER")
+                                .requestMatchers(HttpMethod.GET, "/lojas/produtos").hasAnyRole(new String[]{"USER", "MANAGER"})
+                                /* Endpoints diversos: */
+                                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                                .requestMatchers("/").permitAll()
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
+                                .anyRequest().authenticated()
+                )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -1,6 +1,5 @@
 package com.commerce.api.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
@@ -21,10 +20,6 @@ public class CarrinhoDeCompras {
     @OneToMany(mappedBy = "carrinhoDeCompras", cascade = CascadeType.REMOVE)
     private List<Item> itens;
 
-    @JsonBackReference
-    @OneToOne(mappedBy = "carrinhoDeCompras")
-    private Pedido pedido;
-
     @Min(0)
     private Double total;
 
@@ -33,10 +28,6 @@ public class CarrinhoDeCompras {
     @JsonIgnore
     private Cliente cliente;
 
-    @ManyToOne
-    @JoinColumn(name = "loja_id")
-    @JsonIgnore
-    private Loja loja;
 
     public CarrinhoDeCompras() {
         this.itens = new ArrayList<>();
@@ -57,7 +48,6 @@ public class CarrinhoDeCompras {
     public CarrinhoDeCompras(Long id, List<Item> itens, Pedido pedido, Double total, Cliente cliente) {
         this.id = id;
         this.itens = itens;
-        this.pedido = pedido;
         this.total = total;
         this.cliente = cliente;
     }
@@ -149,14 +139,6 @@ public class CarrinhoDeCompras {
         this.itens = itens;
     }
 
-    public Pedido getPedido() {
-        return pedido;
-    }
-
-    public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
-    }
-
     public Double getTotal() {
         return total;
     }
@@ -174,30 +156,14 @@ public class CarrinhoDeCompras {
     }
 
     @Override
-    public final boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CarrinhoDeCompras that)) return false;
-        if (!super.equals(o)) return false;
-
-        return Objects.equals(id, that.id) && Objects.equals(itens, that.itens) && Objects.equals(pedido, that.pedido) && Objects.equals(total, that.total) && Objects.equals(cliente, that.cliente);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + Objects.hashCode(id);
-        result = 31 * result + Objects.hashCode(itens);
-        result = 31 * result + Objects.hashCode(pedido);
-        result = 31 * result + Objects.hashCode(total);
-        result = 31 * result + Objects.hashCode(cliente);
-        return result;
-    }
-
-    public Loja getLoja() {
-        return loja;
-    }
-
-    public void setLoja(Loja loja) {
-        this.loja = loja;
+        return Objects.hashCode(id);
     }
 }

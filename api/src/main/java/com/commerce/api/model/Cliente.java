@@ -19,7 +19,7 @@ public class Cliente extends Usuario {
 
     @CPF
     private String cpf;
-    @JsonFormat(pattern="dd/MM/yyyy")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dataNasc;
     private String sobrenome;
     private String genero;
@@ -57,9 +57,10 @@ public class Cliente extends Usuario {
 
     public Cliente(String username, String encriptedPassword, String role) {
         super(username, encriptedPassword, role);
-        this.favoritos = new ArrayList<>();
-        this.pedidos = new ArrayList<>();
-        this.carrinhoDeCompras = new ArrayList<>();
+        //List<Foo> list = new ArrayList<Foo>(Arrays.asList(array));
+        this.favoritos = new ArrayList<Produto>();
+        this.pedidos = new ArrayList<Pedido>();
+        this.carrinhoDeCompras = new ArrayList<CarrinhoDeCompras>();
     }
 
     public Cliente(String username, String email, String password, String nome, String telefone, String endereco,
@@ -69,9 +70,9 @@ public class Cliente extends Usuario {
         cpf = cPF;
         this.dataNasc = dataNasc;
         this.genero = genero;
-        this.favoritos = new ArrayList<>();
-        this.pedidos = new ArrayList<>();
-        this.carrinhoDeCompras = new ArrayList<>();
+        this.favoritos = new ArrayList<Produto>();
+        this.pedidos = new ArrayList<Pedido>();
+        this.carrinhoDeCompras = new ArrayList<CarrinhoDeCompras>(  );
     }
 
     public Cliente(String username, String email, String password, String nome, String telefone, String endereco,
@@ -95,6 +96,10 @@ public class Cliente extends Usuario {
 
     public void removerFavorito(Produto produto) {
         this.favoritos.remove(produto);
+    }
+
+    public void adicionarPedido(Pedido pedido) {
+        this.pedidos.add(pedido);
     }
 
     public String getSobrenome() {

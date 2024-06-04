@@ -1,10 +1,12 @@
 package com.commerce.api.controller;
 
 import com.commerce.api.exception.ResourceNotFoundException;
+import com.commerce.api.model.Cliente;
 import com.commerce.api.model.Loja;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.LojaDTO;
 import com.commerce.api.model.dto.LojaUpdateDTO;
+import com.commerce.api.security.TokenService;
 import com.commerce.api.service.LojaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -30,7 +32,9 @@ import org.springframework.web.bind.annotation.*;
 public class LojaController {
 
     @Autowired
-    private LojaService service;
+    private LojaService lojaService;
+    @Autowired
+    private TokenService tokenService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Lista todas as lojas", description = "Consulta o banco de dados e retorna todas as lojas.", tags = {
@@ -52,7 +56,7 @@ public class LojaController {
             @RequestParam(value = "direction", defaultValue = "asc") String direction) {
         var sortDirection = "DESC".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "nome"));
-        return ResponseEntity.ok(service.getAllLojas(pageable));
+        return ResponseEntity.ok(lojaService.getAllLojas(pageable));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -72,11 +76,26 @@ public class LojaController {
     public ResponseEntity<?> getById(@PathVariable("id") Long id) {
         Loja loja;
         try {
-            loja = service.getLojaById(id);
+            loja = lojaService.getLojaById(id);
         } catch (ResourceNotFoundException e) {
             throw new RuntimeException(e);
         }
         return ResponseEntity.ok(loja);
+    }
+
+    @GetMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Exibe o perfil da loja", description = "Consulta o banco de dados e retorna uma loja a partir do username.", tags = {
+            "Loja"}, responses = {
+            @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+            @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
+            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+            @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+    })
+    public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String token) {
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(lojaService.getProfile(username));
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -93,13 +112,13 @@ public class LojaController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<Loja> create(@RequestBody @Valid LojaDTO dto) {
-        return new ResponseEntity<>(service.createLoja(dto), HttpStatus.CREATED);
+        return new ResponseEntity<>(lojaService.createLoja(dto), HttpStatus.CREATED);
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Atualiza uma loja", description = "Instancia um novo objeto do tipo Loja, sobreescreve um Loja com a mesma ID, e salva no banco de dados.", tags = {
             "Lojas"}, responses = {
-            @ApiResponse(description = "Sucess", responseCode = "200",
+            @ApiResponse(description = "Success", responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = Loja.class))
@@ -110,8 +129,9 @@ public class LojaController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Loja> update(@RequestBody @Valid LojaUpdateDTO dto) {
-        return ResponseEntity.ok(service.updateLoja(dto));
+    public ResponseEntity<Loja> update(@RequestHeader("Authorization") String token, @RequestBody @Valid LojaUpdateDTO dto) {
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(lojaService.updateLoja(username, dto));
     }
 
     @DeleteMapping(value = "/{id}")
@@ -129,11 +149,11 @@ public class LojaController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws Exception {
-        service.deleteLoja(id);
+        lojaService.deleteLoja(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(value = "/{id}/produtos", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/produtos", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Lista os produtos de uma loja", description = "Consulta o banco de dados e retorna todos os produtos de uma loja.", tags = {
             "Lojas"}, responses = {
             @ApiResponse(description = "Success", responseCode = "200",
@@ -147,12 +167,12 @@ public class LojaController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity
-            <PagedModel<EntityModel<Produto>>> getAllProdutos(@PathVariable("id") Long lojaID) {
-        return ResponseEntity.ok(service.getAllProdutos(lojaID));
+    public ResponseEntity<PagedModel<EntityModel<Produto>>> getAllProdutos(@RequestHeader(name = "Authorization") String token) {
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(lojaService.getAllProdutos(username));
     }
 
-    @PostMapping(value = "/{id}/produtos",
+    @PostMapping(value = "/produtos",
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Adiciona um produto a uma loja", description = "Utiliza o id passado o reponse body para adicionar um produto a uma loja.", tags = {
             "Lojas"}, responses = {
@@ -167,12 +187,13 @@ public class LojaController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<?> adicionarProduto(@PathVariable("id") Long lojaID, @RequestBody Long produtoId) throws ResourceNotFoundException {
-        service.adicionarProduto(lojaID, produtoId);
+    public ResponseEntity<?> adicionarProduto(@RequestHeader(name = "Authorization") String token, @RequestBody Long produtoId) throws ResourceNotFoundException {
+        String username = tokenService.getUsernameFromToken(token);
+        lojaService.adicionarProduto(username, produtoId);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(value = "/{id}/produtos",
+    @DeleteMapping(value = "/produtos",
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Remove um produto de uma loja", description = "Utiliza o id passado o reponse body para remover um produto de uma loja.", tags = {
             "Lojas"}, responses = {
@@ -187,8 +208,9 @@ public class LojaController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<?> removeProduto(@PathVariable("id") Long lojaID, @RequestBody Long produtoId) throws ResourceNotFoundException {
-        service.removerProduto(lojaID, produtoId);
+    public ResponseEntity<?> removeProduto(@RequestHeader(name = "Authorization") String token, @RequestBody Long produtoId) throws ResourceNotFoundException {
+        String username = tokenService.getUsernameFromToken(token);
+        lojaService.removerProduto(username, produtoId);
         return ResponseEntity.ok().build();
     }
 }

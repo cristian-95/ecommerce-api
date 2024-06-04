@@ -186,5 +186,18 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
         } else return qtdeEstoque.equals(other.qtdeEstoque);
     }
 
-
+    @Override
+    public String toString() {
+        return "Produto{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", specs=" + specs +
+                ", preco=" + preco +
+                ", qtdeEstoque=" + qtdeEstoque +
+                ", clientes=" + clientes +
+                ", itens=" + itens +
+                ", loja=" + loja +
+                '}';
+    }
 }

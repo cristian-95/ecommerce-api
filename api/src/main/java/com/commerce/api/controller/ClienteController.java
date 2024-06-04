@@ -3,10 +3,10 @@ package com.commerce.api.controller;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.CarrinhoDeCompras;
 import com.commerce.api.model.Cliente;
-import com.commerce.api.model.Pedido;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ClienteDTO;
 import com.commerce.api.model.dto.ClienteUpdateDTO;
+import com.commerce.api.security.TokenService;
 import com.commerce.api.service.CarrinhoDeComprasService;
 import com.commerce.api.service.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,9 +35,11 @@ import java.util.List;
 public class ClienteController {
 
     @Autowired
-    private ClienteService service;
+    private ClienteService clienteService;
     @Autowired
     private CarrinhoDeComprasService carrinhoDeComprasService;
+    @Autowired
+    private TokenService tokenService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Lista todos os clientes", description = "Consulta o banco de dados e retorna todos os clientes.", tags = {
@@ -56,7 +58,7 @@ public class ClienteController {
     ) {
         var sortDirection = "DESC".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "nome"));
-        return ResponseEntity.ok(service.getAllClientes(pageable));
+        return ResponseEntity.ok(clienteService.getAllClientes(pageable));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -72,11 +74,26 @@ public class ClienteController {
     public ResponseEntity<?> getById(@PathVariable("id") Long id) {
         Cliente cliente;
         try {
-            cliente = service.getClienteById(id);
+            cliente = clienteService.getClienteById(id);
         } catch (ResourceNotFoundException e) {
             throw new RuntimeException(e);
         }
         return ResponseEntity.ok(cliente);
+    }
+
+    @GetMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Exibe o perfil do cliente", description = "Consulta o banco de dados e retorna um cliente a partir do username.", tags = {
+            "Clientes"}, responses = {
+            @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+            @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
+            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+            @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+    })
+    public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String token) {
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(clienteService.getProfile(username));
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -89,7 +106,7 @@ public class ClienteController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<Cliente> create(@RequestBody @Valid ClienteDTO dto) throws ResourceNotFoundException {
-        return new ResponseEntity<>(service.createCliente(dto), HttpStatus.CREATED);
+        return new ResponseEntity<>(clienteService.createCliente(dto), HttpStatus.CREATED);
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -102,8 +119,9 @@ public class ClienteController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Cliente> update(@RequestBody @Valid ClienteUpdateDTO dto) throws ResourceNotFoundException {
-        return ResponseEntity.ok(service.updateCliente(dto));
+    public ResponseEntity<Cliente> update(@RequestHeader(name = "Authorization") String token, @RequestBody @Valid ClienteUpdateDTO dto) throws ResourceNotFoundException {
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(clienteService.updateCliente(username, dto));
     }
 
     @DeleteMapping(value = "/{id}")
@@ -117,11 +135,11 @@ public class ClienteController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws Exception {
-        service.deleteCliente(id);
+        clienteService.deleteCliente(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(value = "/{id}/carrinho", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/carrinho", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Lista os  produtos no carrinho de  um cliente", description = "Consulta o banco de dados e retorna todos os produtos no carrinho de um cliente.", tags = {
             "Clientes"}, responses = {
             @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
@@ -131,11 +149,12 @@ public class ClienteController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<CarrinhoDeCompras> getCarrinho(@PathVariable("id") Long clienteID) throws ResourceNotFoundException {
-        return ResponseEntity.ok(service.getCarrinho(clienteID));
+    public ResponseEntity<CarrinhoDeCompras> getCarrinho(@RequestHeader(name = "Authorization") String token) throws ResourceNotFoundException {
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(clienteService.getCarrinho(username));
     }
 
-    @PostMapping(value = "/{id}/carrinho", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/carrinho", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Adiciona um produto ao carrinho de compras de  um cliente", description = "Utiliza o id passado o reponse body para adicionar um produto ao carrinho de compras de um cliente.", tags = {
             "Clientes"}, responses = {
             @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
@@ -145,12 +164,13 @@ public class ClienteController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<CarrinhoDeCompras> adicionarAoCarrinho(@PathVariable("id") Long clienteID, @RequestBody Long produtoId)
+    public ResponseEntity<CarrinhoDeCompras> adicionarAoCarrinho(@RequestHeader(name = "Authorization") String token, @RequestBody Long produtoId)
             throws ResourceNotFoundException {
-        return ResponseEntity.ok(service.adicionarAoCarrinho(clienteID, produtoId));
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(clienteService.adicionarAoCarrinho(username, produtoId));
     }
 
-    @DeleteMapping(value = "/{id}/carrinho", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/carrinho", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Remove um produto do carrinho de compras de um cliente", description = "Utiliza o id passado o reponse body para remover um produto do carrinho de compras de  um cliente.", tags = {
             "Clientes"}, responses = {
             @ApiResponse(description = "Success", responseCode = "200", content = @Content),
@@ -160,26 +180,13 @@ public class ClienteController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<CarrinhoDeCompras> removerDoCarrinho(@PathVariable("id") Long clienteID, @RequestBody Long produtoId)
+    public ResponseEntity<CarrinhoDeCompras> removerDoCarrinho(@RequestHeader(name = "Authorization") String token, @RequestBody Long produtoId)
             throws ResourceNotFoundException {
-        return ResponseEntity.ok(service.removerDoCarrinho(clienteID, produtoId));
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(clienteService.removerDoCarrinho(username, produtoId));
     }
 
-    @GetMapping(value = "/{id}/pedidos", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Lista o histórico de pedidos de  um cliente", description = "Lista o histórico de pedidos de  um cliente", tags = {
-            "Clientes"}, responses = {
-            @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Pedido.class)))),
-            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
-            @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
-            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-            @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-    })
-    public ResponseEntity<List<Pedido>> getAllPedidos(@PathVariable("id") Long clienteID) throws ResourceNotFoundException {
-        return ResponseEntity.ok(service.getAllPedidos(clienteID));
-    }
-
-    @GetMapping(value = "/{id}/favoritos", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/favoritos", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Lista os  produtos favoritos de  um cliente", description = "Consulta o banco de dados e retorna todos os produtos favoritos de um cliente.", tags = {
             "Clientes"}, responses = {
             @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
@@ -189,11 +196,12 @@ public class ClienteController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<List<Produto>> getAllFavoritos(@PathVariable("id") Long clienteID) throws ResourceNotFoundException {
-        return ResponseEntity.ok(service.getAllFavoritos(clienteID));
+    public ResponseEntity<List<Produto>> getAllFavoritos(@RequestHeader(name = "Authorization") String token) throws ResourceNotFoundException {
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(clienteService.getAllFavoritos(username));
     }
 
-    @PostMapping(value = "/{id}/favoritos", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/favoritos", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Adiciona um produto aos favoritos de  um cliente", description = "Utiliza o id passado o reponse body para adicionar um produto aos favoritos de  um cliente.", tags = {
             "Clientes"}, responses = {
             @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
@@ -203,12 +211,13 @@ public class ClienteController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Produto> adicionarFavorito(@PathVariable("id") Long clienteID, @RequestBody Long produtoId)
+    public ResponseEntity<Produto> adicionarFavorito(@RequestHeader(name = "Authorization") String token, @RequestBody Long produtoId)
             throws ResourceNotFoundException {
-        return ResponseEntity.ok(service.adicionarFavorito(clienteID, produtoId));
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(clienteService.adicionarFavorito(username, produtoId));
     }
 
-    @DeleteMapping(value = "/{id}/favoritos", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/favoritos", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Remove um produto dos favoritos de  um cliente", description = "Utiliza o id passado o reponse body para remover um produto dos favoritos de  um cliente.", tags = {
             "Clientes"}, responses = {
             @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
@@ -218,8 +227,9 @@ public class ClienteController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Produto> removerFavorito(@PathVariable("id") Long clienteID, @RequestBody Long produtoId)
+    public ResponseEntity<Produto> removerFavorito(@RequestHeader(name = "Authorization") String token, @RequestBody Long produtoId)
             throws ResourceNotFoundException {
-        return ResponseEntity.ok(service.removerFavorito(clienteID, produtoId));
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(clienteService.removerFavorito(username, produtoId));
     }
 }

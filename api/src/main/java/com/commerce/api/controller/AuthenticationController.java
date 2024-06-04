@@ -83,20 +83,20 @@ public class AuthenticationController {
     })
     public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
         Usuario user;
-        String encriptedPassword;
+        String encryptedPassword;
         if (UserRole.valueOf(data.role().toUpperCase()) == UserRole.USER) {
             if (this.clienteRepository.findByUsername(data.username()) != null)
                 return ResponseEntity.badRequest().build();
 
-            encriptedPassword = new BCryptPasswordEncoder().encode(data.password());
-            Cliente newCliente = new Cliente(data.username(), encriptedPassword, data.role().toUpperCase());
+            encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+            Cliente newCliente = new Cliente(data.username(), encryptedPassword, data.role().toUpperCase());
             user = clienteService.createNewClienteAccount(newCliente);
         } else {
             if (this.lojaRepository.findByUsername(data.username()) != null)
                 return ResponseEntity.badRequest().build();
 
-            encriptedPassword = new BCryptPasswordEncoder().encode(data.password());
-            Loja newLoja = new Loja(data.username(), encriptedPassword, data.role().toUpperCase());
+            encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+            Loja newLoja = new Loja(data.username(), encryptedPassword, data.role().toUpperCase());
             user = lojaService.createNewLojaAccount(newLoja);
         }
         return ResponseEntity.ok(user);

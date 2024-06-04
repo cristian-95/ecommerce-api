@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "lojas")
 @JsonPropertyOrder({"id", "username", "endereco", "email", "telefone", "nome", "cnpj", "pedidos", "produtos"})
-public class Loja extends Usuario {
+public class  Loja extends Usuario {
 
     @CNPJ
     private String CNPJ;
@@ -27,7 +27,6 @@ public class Loja extends Usuario {
 
     @JsonIgnore
     @OneToMany(mappedBy = "loja")
-    @JsonManagedReference
     private List<Pedido> pedidos;
 
     public Loja() {
@@ -99,6 +98,10 @@ public class Loja extends Usuario {
         if (!this.produtos.contains(produto)) {
             this.produtos.remove(produto);
         }
+    }
+
+    public void adicionarPedido(Pedido pedido) {
+        this.pedidos.add(pedido);
     }
 
     @Override

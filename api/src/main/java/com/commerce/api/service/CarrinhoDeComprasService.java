@@ -17,18 +17,18 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class CarrinhoDeComprasService {
 
     @Autowired
-    private CarrinhoDeComprasRepository repository;
+    private CarrinhoDeComprasRepository carrinhoDeComprasRepository;
     @Autowired
     private ProdutoService produtoService;
     @Autowired
     private ItemRepository itemRepository;
 
     public void save(CarrinhoDeCompras carrinhoDeCompras) {
-        this.repository.save(carrinhoDeCompras);
+        this.carrinhoDeComprasRepository.save(carrinhoDeCompras);
     }
 
     public CarrinhoDeCompras getCarrinhoDeComprasById(Long id) throws ResourceNotFoundException {
-        CarrinhoDeCompras carrinhoDeCompras = repository.findById(id).orElseThrow();
+        CarrinhoDeCompras carrinhoDeCompras = carrinhoDeComprasRepository.findById(id).orElseThrow();
         carrinhoDeCompras.getItens().forEach(i -> i.getProduto().add(linkTo(methodOn(ProdutoController.class).getById(i.getProduto().getId())).withSelfRel()));
         return carrinhoDeCompras;
     }
@@ -39,7 +39,7 @@ public class CarrinhoDeComprasService {
         Produto produto = produtoService.getProdutoById(produtoId);
         Item savedItem = carrinhoDeCompras.adicionarItem(produto);
         itemRepository.save(savedItem);
-        return repository.save(carrinhoDeCompras);
+        return carrinhoDeComprasRepository.save(carrinhoDeCompras);
     }
 
     public CarrinhoDeCompras adicionarItem(CarrinhoDeCompras carrinhoDeCompras, Long produtoId)
@@ -47,7 +47,7 @@ public class CarrinhoDeComprasService {
         Produto produto = produtoService.getProdutoById(produtoId);
         Item savedItem = carrinhoDeCompras.adicionarItem(produto);
         itemRepository.save(savedItem);
-        return repository.save(carrinhoDeCompras);
+        return carrinhoDeComprasRepository.save(carrinhoDeCompras);
     }
 
     public CarrinhoDeCompras removerItem(Long carrinhoId, Long produtoId)
@@ -57,7 +57,7 @@ public class CarrinhoDeComprasService {
             Item item = carrinhoDeCompras.getItemByProdutoId(produtoId);
             itemRepository.delete(item);
         }
-        return repository.save(carrinhoDeCompras);
+        return carrinhoDeComprasRepository.save(carrinhoDeCompras);
     }
 
     public CarrinhoDeCompras removerItem(CarrinhoDeCompras carrinhoDeCompras, Long produtoId)
@@ -67,10 +67,14 @@ public class CarrinhoDeComprasService {
             Item item = carrinhoDeCompras.getItemByProdutoId(produtoId);
             itemRepository.delete(item);
         }
-        return repository.save(carrinhoDeCompras);
+        return carrinhoDeComprasRepository.save(carrinhoDeCompras);
     }
 
-    public CarrinhoDeCompras create(CarrinhoDeCompras carrinhoDeCompras) {
-        return repository.save(carrinhoDeCompras);
+    public void remover(CarrinhoDeCompras carrinhoDeCompras) {
+        this.carrinhoDeComprasRepository.delete(carrinhoDeCompras);
+    }
+
+    CarrinhoDeCompras create(CarrinhoDeCompras carrinhoDeCompras) {
+        return carrinhoDeComprasRepository.save(carrinhoDeCompras);
     }
 }

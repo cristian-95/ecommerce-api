@@ -23,7 +23,7 @@ public record ClienteDTO(
         String sobrenome,
         @CPF
         String CPF,
-        @JsonFormat(pattern="dd/MM/yyyy")
+        @JsonFormat(pattern = "dd/MM/yyyy")
         LocalDate dataNasc,
         String genero
 ) {

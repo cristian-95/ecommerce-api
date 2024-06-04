@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Email;
 import org.hibernate.validator.constraints.br.CNPJ;
 
 public record LojaUpdateDTO(
-        Long id,
         @Email(message = "E-mail em formato inválido.")
         String email,
         @Column(nullable = true)

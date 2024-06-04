@@ -3,6 +3,7 @@ package com.commerce.api.controller;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ProdutoDTO;
+import com.commerce.api.security.TokenService;
 import com.commerce.api.service.ProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -28,7 +29,9 @@ import org.springframework.web.bind.annotation.*;
 public class ProdutoController {
 
     @Autowired
-    private ProdutoService service;
+    private ProdutoService produtoService;
+    @Autowired
+    private TokenService tokenService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Lista todos os produtos", description = "Consulta o banco de dados e retorna todos os produtos.", tags = {
@@ -51,7 +54,7 @@ public class ProdutoController {
     ) {
         var sortDirection = "DESC".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "nome"));
-        return ResponseEntity.ok(service.getAllProdutos(pageable));
+        return ResponseEntity.ok(produtoService.getAllProdutos(pageable));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -69,7 +72,7 @@ public class ProdutoController {
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
     public ResponseEntity<?> getById(@PathVariable("id") Long id) throws ResourceNotFoundException {
-        Produto produto = service.getProdutoById(id);
+        Produto produto = produtoService.getProdutoById(id);
         if (produto == null)
             return new ResponseEntity<>("Produto não encontrado.", HttpStatus.NOT_FOUND);
         return ResponseEntity.ok(produto);
@@ -88,8 +91,10 @@ public class ProdutoController {
             @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Produto> create(@RequestBody @Valid ProdutoDTO dto) {
-        return new ResponseEntity<>(service.createProduto(dto), HttpStatus.CREATED);
+    public ResponseEntity<Produto> create(@RequestHeader("Authorization") String token, @RequestBody @Valid ProdutoDTO dto) {
+        token = token.replace("Bearer ", "");
+        String username = tokenService.validateToken(token);
+        return new ResponseEntity<>(produtoService.createProduto(username, dto), HttpStatus.CREATED);
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -106,8 +111,10 @@ public class ProdutoController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Produto> update(@RequestBody @Valid ProdutoDTO dto) throws ResourceNotFoundException {
-        return ResponseEntity.ok(service.updateProduto(dto));
+    public ResponseEntity<Produto> update(@RequestHeader("Authorization") String token, @RequestBody @Valid ProdutoDTO dto) throws ResourceNotFoundException {
+        token = token.replace("Bearer ", "");
+        String username = tokenService.validateToken(token);
+        return ResponseEntity.ok(produtoService.updateProduto(username, dto));
     }
 
     @DeleteMapping(value = "/{id}")
@@ -124,8 +131,10 @@ public class ProdutoController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws Exception {
-        service.deleteProduto(id);
+    public ResponseEntity<?> delete(@RequestHeader("Authorization") String token, @PathVariable("id") Long id) throws Exception {
+        token = token.replace("Bearer ", "");
+        String username = tokenService.validateToken(token);
+        produtoService.deleteProduto(username, id);
         return ResponseEntity.noContent().build();
     }
 }

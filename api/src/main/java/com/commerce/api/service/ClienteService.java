@@ -4,7 +4,6 @@ import com.commerce.api.controller.ClienteController;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.CarrinhoDeCompras;
 import com.commerce.api.model.Cliente;
-import com.commerce.api.model.Pedido;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ClienteDTO;
 import com.commerce.api.model.dto.ClienteUpdateDTO;
@@ -29,21 +28,16 @@ public class ClienteService {
     @Autowired
     private PagedResourcesAssembler<Cliente> assembler;
     @Autowired
-    private ClienteRepository repository;
+    private ClienteRepository clienteRepository;
     @Autowired
     private ProdutoService produtoService;
     @Autowired
     private CarrinhoDeComprasService carrinhoDeComprasService;
 
-    public void save(Cliente cliente) {
-        this.repository.save(cliente);
-    }
-
     public Cliente createNewClienteAccount(Cliente newCliente) {
         newCliente.setCarrinhoDeCompras(List.of(new CarrinhoDeCompras()));
-        Cliente saved = this.repository.save(newCliente);
+        Cliente saved = this.clienteRepository.save(newCliente);
         saved.add(linkTo(methodOn(ClienteController.class).getById(saved.getId())).withSelfRel());
-
         return saved;
     }
 
@@ -51,42 +45,45 @@ public class ClienteService {
         Cliente cliente = new Cliente(dto);
         String encriptedPassword = new BCryptPasswordEncoder().encode(dto.password());
         cliente.setPassword(encriptedPassword);
-        Cliente saved = this.repository.save(cliente);
+        Cliente saved = this.clienteRepository.save(cliente);
         saved.add(linkTo(methodOn(ClienteController.class).getById(saved.getId())).withSelfRel());
 
         return saved;
     }
 
+    public Cliente getProfile(String username) {
+        return clienteRepository.findByUsername(username);
+    }
+
     public PagedModel<EntityModel<Cliente>> getAllClientes(Pageable pageable) {
-        Page<Cliente> clientes = this.repository.findAll(pageable);
+        Page<Cliente> clientes = this.clienteRepository.findAll(pageable);
         clientes.forEach(c -> c.add(linkTo(methodOn(ClienteController.class).getById(c.getId())).withSelfRel()));
         return this.assembler.toModel(clientes);
     }
 
     public Cliente getClienteById(Long id) throws ResourceNotFoundException {
-        Cliente cliente = this.repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
+        Cliente cliente = this.clienteRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
         cliente.add(linkTo(methodOn(ClienteController.class).getAll(0, 0, "")).withRel("listagem"));
 
         return cliente;
     }
 
-    public Cliente updateCliente(ClienteUpdateDTO dto) throws ResourceNotFoundException {
-        Cliente cliente = getClienteById(dto.id());
-        Cliente updated = this.repository.save(updateProperties(cliente, dto));
+    public Cliente updateCliente(String username, ClienteUpdateDTO dto) throws ResourceNotFoundException {
+        Cliente cliente = getProfile(username);
+        Cliente updated = this.clienteRepository.save(updateProperties(cliente, dto));
         updated.add(linkTo(methodOn(ClienteController.class).getById(updated.getId())).withSelfRel());
-
         return updated;
     }
 
     public void deleteCliente(Long id) {
-        if (this.repository.existsById(id)) {
-            Cliente cliente = this.repository.findById(id).get();
-            this.repository.delete(cliente);
+        if (this.clienteRepository.existsById(id)) {
+            Cliente cliente = this.clienteRepository.findById(id).get();
+            this.clienteRepository.delete(cliente);
         }
     }
 
-    public CarrinhoDeCompras getCarrinho(Long clienteId) throws ResourceNotFoundException {
-        Cliente cliente = getClienteById(clienteId);
+    public CarrinhoDeCompras getCarrinho(String username) throws ResourceNotFoundException {
+        Cliente cliente = clienteRepository.findByUsername(username);
         CarrinhoDeCompras response;
         if (!cliente.getCarrinhoDeCompras().isEmpty()) {
             Long carrinhoId = cliente.getCarrinhoDeCompras().get(0).getId();
@@ -95,50 +92,48 @@ public class ClienteService {
             CarrinhoDeCompras carrinhoDeCompras = new CarrinhoDeCompras(cliente);
             response = this.carrinhoDeComprasService.create(carrinhoDeCompras);
         }
-
         return response;
     }
 
-    public CarrinhoDeCompras adicionarAoCarrinho(Long clienteId, Long produtoId) throws ResourceNotFoundException {
-        CarrinhoDeCompras carrinhoDeCompras = getCarrinho(clienteId);
+    public CarrinhoDeCompras adicionarAoCarrinho(String username, Long produtoId) throws ResourceNotFoundException {
+        CarrinhoDeCompras carrinhoDeCompras = getCarrinho(username);
         carrinhoDeCompras = this.carrinhoDeComprasService.adicionarItem(carrinhoDeCompras, produtoId);
 
         return carrinhoDeCompras;
     }
 
-    public CarrinhoDeCompras removerDoCarrinho(Long clienteId, Long produtoId) throws ResourceNotFoundException {
-        CarrinhoDeCompras carrinhoDeCompras = getCarrinho(clienteId);
+    public CarrinhoDeCompras removerDoCarrinho(String username, Long produtoId) throws ResourceNotFoundException {
+        CarrinhoDeCompras carrinhoDeCompras = getCarrinho(username);
         carrinhoDeCompras = this.carrinhoDeComprasService.removerItem(carrinhoDeCompras, produtoId);
 
         return carrinhoDeCompras;
     }
 
-    public Produto adicionarFavorito(Long clienteId, Long produtoId) throws ResourceNotFoundException {
-        Cliente cliente = getClienteById(clienteId);
+    public Produto adicionarFavorito(String username, Long produtoId) throws ResourceNotFoundException {
+        Cliente cliente = clienteRepository.findByUsername(username);
         Produto produto = this.produtoService.getProdutoById(produtoId);
         cliente.adicionarFavorito(produto);
-        this.repository.save(cliente);
+        this.clienteRepository.save(cliente);
 
         return produto;
     }
 
-    public Produto removerFavorito(Long clienteId, Long produtoId) throws ResourceNotFoundException {
-        Cliente cliente = getClienteById(clienteId);
+    public Produto removerFavorito(String username, Long produtoId) throws ResourceNotFoundException {
+        Cliente cliente = clienteRepository.findByUsername(username);
         Produto produto = this.produtoService.getProdutoById(produtoId);
         cliente.removerFavorito(produto);
-        this.repository.save(cliente);
+        this.clienteRepository.save(cliente);
 
         return produto;
     }
 
-    public List<Produto> getAllFavoritos(Long clienteId) throws ResourceNotFoundException {
-        Cliente cliente = getClienteById(clienteId);
+    public List<Produto> getAllFavoritos(String username) throws ResourceNotFoundException {
+        Cliente cliente = clienteRepository.findByUsername(username);
         return cliente.getFavoritos();
     }
 
-    public List<Pedido> getAllPedidos(Long clienteId) throws ResourceNotFoundException {
-        Cliente cliente = getClienteById(clienteId);
-        return cliente.getPedidos();
+    void save(Cliente cliente) {
+        this.clienteRepository.save(cliente);
     }
 
     private Cliente updateProperties(Cliente cliente, ClienteUpdateDTO dto) {

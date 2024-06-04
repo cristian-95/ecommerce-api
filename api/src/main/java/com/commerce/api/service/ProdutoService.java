@@ -2,8 +2,10 @@ package com.commerce.api.service;
 
 import com.commerce.api.controller.ProdutoController;
 import com.commerce.api.exception.ResourceNotFoundException;
+import com.commerce.api.model.Loja;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ProdutoDTO;
+import com.commerce.api.repository.LojaRepository;
 import com.commerce.api.repository.ProdutoRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ public class ProdutoService {
     PagedResourcesAssembler<Produto> assembler;
     @Autowired
     private ProdutoRepository produtoRepository;
+    @Autowired
+    private LojaRepository lojaRepository;
 
     public PagedModel<EntityModel<Produto>> getAllProdutos(Pageable pageable) {
         Page<Produto> produtos = produtoRepository.findAll(pageable);
@@ -40,37 +44,50 @@ public class ProdutoService {
         return produto;
     }
 
-    public Produto createProduto(ProdutoDTO dto) {
+    public Produto createProduto(String username, ProdutoDTO dto) {
+        Loja loja = lojaRepository.findByUsername(username);
         Produto produto = new Produto(dto);
+        produto.setLoja(loja);
         Produto saved = produtoRepository.save(produto);
         saved.add(linkTo(methodOn(ProdutoController.class).getById(saved.getId())).withSelfRel());
         return saved;
     }
 
-    public Produto updateProduto(ProdutoDTO dto) throws ResourceNotFoundException {
+    public Produto updateProduto(String username, ProdutoDTO dto) throws ResourceNotFoundException {
+        Loja loja = lojaRepository.findByUsername(username);
         Produto produto = getProdutoById(dto.id());
-        Produto updated = produtoRepository.save(updateProperties(produto, dto));
-        updated.add(linkTo(methodOn(ProdutoController.class).getById(updated.getId())).withSelfRel());
-        return updated;
+        if (loja.equals(produto.getLoja())) {
+            Produto updated = produtoRepository.save(updateProperties(produto, dto));
+            updated.add(linkTo(methodOn(ProdutoController.class).getById(updated.getId())).withSelfRel());
+            return updated;
+        } else {
+            return null;
+        }
     }
 
-    public void updateProduto(Produto updatedProduto) throws ResourceNotFoundException {
+    public void updateProduto(String username, Produto updatedProduto) throws ResourceNotFoundException {
+        Loja loja = lojaRepository.findByUsername(username);
         Produto produto = getProdutoById(updatedProduto.getId());
-        BeanUtils.copyProperties(updatedProduto, produto);
-        produtoRepository.save(produto);
+        if (loja.equals(updatedProduto.getLoja())) {
+            BeanUtils.copyProperties(updatedProduto, produto);
+            produtoRepository.save(produto);
+        }
     }
 
-    public void deleteProduto(Long id) {
+    public void deleteProduto(String username, Long id) {
+        Loja loja = lojaRepository.findByUsername(username);
         try {
             Produto produto = produtoRepository.findById(id).get();
-            produtoRepository.delete(produto);
+            if (loja.equals(produto.getLoja())) {
+                produtoRepository.delete(produto);
+            }
         } catch (Exception e) {
             throw new ResourceNotFoundException("Produto (id = %d) não encontrado".formatted(id));
         }
     }
 
-    public PagedModel<EntityModel<Produto>> getAllProdutosByLojaId(Long lojaId) {
-        List<Produto> produtos = produtoRepository.findByLojaId(lojaId);
+    public PagedModel<EntityModel<Produto>> getAllProdutosByLoja(Loja loja) {
+        List<Produto> produtos = produtoRepository.findByLojaId(loja.getId());
         produtos.forEach(p -> p.add(linkTo(methodOn(ProdutoController.class).getById(p.getId())).withSelfRel()));
         Page<Produto> page = new PageImpl<>(produtos);
         return assembler.toModel(page);
@@ -85,4 +102,7 @@ public class ProdutoService {
         return produto;
     }
 
+    public void save(Produto produto) {
+        this.produtoRepository.save(produto);
+    }
 }

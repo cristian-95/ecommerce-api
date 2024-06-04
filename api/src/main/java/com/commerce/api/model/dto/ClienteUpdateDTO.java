@@ -8,7 +8,6 @@ import org.hibernate.validator.constraints.br.CPF;
 import java.time.LocalDate;
 
 public record ClienteUpdateDTO(
-        Long id,
         @Email(message = "E-mail em formato inválido.")
         String email,
         @Column(nullable = true)

@@ -1,24 +1,26 @@
 package com.commerce.api.exception;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 @Component
 public class ErrorMessage {
 
     private String message;
     private Integer statusCode;
-    private LocalTime timestamp;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "GMT-3")
+    private LocalDateTime timestamp;
 
     public ErrorMessage() {
-        this.timestamp = LocalTime.now();
+        this.timestamp = LocalDateTime.now();
     }
 
     public ErrorMessage(String message, Integer statusCode) {
         this.message = message;
         this.statusCode = statusCode;
-        this.timestamp = LocalTime.now();
+        this.timestamp = LocalDateTime.now();
     }
 
     public String getMessage() {
@@ -37,11 +39,11 @@ public class ErrorMessage {
         this.statusCode = statusCode;
     }
 
-    public LocalTime getTimestamp() {
+    public LocalDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalTime timestamp) {
+    public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
 }
