@@ -3,6 +3,7 @@ package com.commerce.api.service;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.*;
 import com.commerce.api.model.dto.PedidoUpdateDTO;
+import com.commerce.api.model.dto.RequestDTO;
 import com.commerce.api.repository.ItemRepository;
 import com.commerce.api.repository.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +78,7 @@ public class PedidoService {
         }
         CarrinhoDeCompras novoCarrinho = new CarrinhoDeCompras(cliente);
         criarCarrinhoNovo(carrinhoDeCompras, novoCarrinho, cliente);
-        removerCarrinhoAntigo(carrinhoDeCompras);
+//        removerCarrinhoAntigo(carrinhoDeCompras);
 
         this.clienteService.save(cliente);
         return pedidos;
@@ -94,12 +95,14 @@ public class PedidoService {
         return this.pedidoRepository.save(pedido);
     }
 
-    public void deletePedido(Long id) {
+    public void deletePedido(String username, RequestDTO requestDTO) {
         try {
-            Pedido pedido = this.pedidoRepository.findById(id).get();
-            this.pedidoRepository.delete(pedido);
+            Loja loja = lojaService.getProfile(username);
+            Pedido pedido = this.pedidoRepository.findById(requestDTO.id()).get();
+            if (loja.equals(pedido.getLoja()));
+                this.pedidoRepository.delete(pedido);
         } catch (Exception e) {
-            throw new ResourceNotFoundException("Pedido (id = %d) não encontrado".formatted(id));
+            throw new ResourceNotFoundException("Pedido (id = %d) não encontrado".formatted(requestDTO.id()));
         }
     }
 
@@ -115,8 +118,9 @@ public class PedidoService {
         this.pedidoRepository.save(pedido);
         List<Item> itens = pedido.getItens();
         itens.forEach(i -> {
-            i.setPedido(pedido);
-            itemRepository.save(i);
+            Item item = itemRepository.findById(i.getId()).get();
+            item.setPedido(pedido);
+            itemRepository.save(item);
         });
 
         this.lojaService.save(loja);
@@ -128,7 +132,7 @@ public class PedidoService {
 
     private void criarCarrinhoNovo(CarrinhoDeCompras carrinhoDeCompras, CarrinhoDeCompras novoCarrinho, Cliente cliente) {
         this.carrinhoDeComprasService.create(novoCarrinho);
-        cliente.getCarrinhoDeCompras().add(0, novoCarrinho);
+        cliente.getCarrinhoDeCompras().add(novoCarrinho);
         cliente.getCarrinhoDeCompras().remove(carrinhoDeCompras);
     }
 }

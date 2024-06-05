@@ -3,6 +3,7 @@ package com.commerce.api.controller;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ProdutoDTO;
+import com.commerce.api.model.dto.RequestDTO;
 import com.commerce.api.security.TokenService;
 import com.commerce.api.service.ProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -117,7 +118,7 @@ public class ProdutoController {
         return ResponseEntity.ok(produtoService.updateProduto(username, dto));
     }
 
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping
     @Operation(summary = "Remove um produto", description = "Consulta o banco de dados e remove um determinado produto do banco de dados, a partir do número de id passado na URI.", tags = {
             "Produtos"}, responses = {
             @ApiResponse(description = "No Content", responseCode = "204",
@@ -131,10 +132,9 @@ public class ProdutoController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<?> delete(@RequestHeader("Authorization") String token, @PathVariable("id") Long id) throws Exception {
-        token = token.replace("Bearer ", "");
-        String username = tokenService.validateToken(token);
-        produtoService.deleteProduto(username, id);
+    public ResponseEntity<?> delete(@RequestHeader("Authorization") String token, @RequestBody RequestDTO requestDTO) throws Exception {
+        String username = tokenService.getUsernameFromToken(token);
+        produtoService.deleteProduto(username, requestDTO);
         return ResponseEntity.noContent().build();
     }
 }

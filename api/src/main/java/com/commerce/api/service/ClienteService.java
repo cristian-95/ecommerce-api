@@ -7,6 +7,7 @@ import com.commerce.api.model.Cliente;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ClienteDTO;
 import com.commerce.api.model.dto.ClienteUpdateDTO;
+import com.commerce.api.model.dto.RequestDTO;
 import com.commerce.api.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -75,18 +77,20 @@ public class ClienteService {
         return updated;
     }
 
-    public void deleteCliente(Long id) {
-        if (this.clienteRepository.existsById(id)) {
-            Cliente cliente = this.clienteRepository.findById(id).get();
+    public void deleteCliente(String username) {
+        if (this.clienteRepository.existsByUsername(username)) {
+            Cliente cliente = this.clienteRepository.findByUsername(username);
             this.clienteRepository.delete(cliente);
-        }
+        }   
     }
 
     public CarrinhoDeCompras getCarrinho(String username) throws ResourceNotFoundException {
         Cliente cliente = clienteRepository.findByUsername(username);
         CarrinhoDeCompras response;
         if (!cliente.getCarrinhoDeCompras().isEmpty()) {
-            Long carrinhoId = cliente.getCarrinhoDeCompras().get(0).getId();
+            List<CarrinhoDeCompras> carrinhoDeComprasList = cliente.getCarrinhoDeCompras();
+            Collections.reverse(carrinhoDeComprasList);
+            Long carrinhoId = carrinhoDeComprasList.get(0).getId();
             response = this.carrinhoDeComprasService.getCarrinhoDeComprasById(carrinhoId);
         } else {
             CarrinhoDeCompras carrinhoDeCompras = new CarrinhoDeCompras(cliente);
@@ -95,16 +99,16 @@ public class ClienteService {
         return response;
     }
 
-    public CarrinhoDeCompras adicionarAoCarrinho(String username, Long produtoId) throws ResourceNotFoundException {
+    public CarrinhoDeCompras adicionarAoCarrinho(String username, RequestDTO requestDTO) throws ResourceNotFoundException {
         CarrinhoDeCompras carrinhoDeCompras = getCarrinho(username);
-        carrinhoDeCompras = this.carrinhoDeComprasService.adicionarItem(carrinhoDeCompras, produtoId);
+        carrinhoDeCompras = this.carrinhoDeComprasService.adicionarItem(carrinhoDeCompras, requestDTO.id());
 
         return carrinhoDeCompras;
     }
 
-    public CarrinhoDeCompras removerDoCarrinho(String username, Long produtoId) throws ResourceNotFoundException {
+    public CarrinhoDeCompras removerDoCarrinho(String username, RequestDTO requestDTO) throws ResourceNotFoundException {
         CarrinhoDeCompras carrinhoDeCompras = getCarrinho(username);
-        carrinhoDeCompras = this.carrinhoDeComprasService.removerItem(carrinhoDeCompras, produtoId);
+        carrinhoDeCompras = this.carrinhoDeComprasService.removerItem(carrinhoDeCompras, requestDTO.id());
 
         return carrinhoDeCompras;
     }

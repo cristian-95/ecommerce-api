@@ -28,7 +28,8 @@ public class Item {
     @JoinColumn(name = "carrinho_de_compras_id")
     private CarrinhoDeCompras carrinhoDeCompras;
 
-    @ManyToOne(targetEntity = Pedido.class)
+    @ManyToOne
+    @JoinColumn(name="pedido_id")
     private Pedido pedido;
 
     public Item() {

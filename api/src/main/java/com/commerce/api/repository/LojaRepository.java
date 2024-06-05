@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface LojaRepository extends JpaRepository<Loja, Long> {
 
     Loja findByUsername(String username);
+
+    boolean existsByUsername(String username);
 }

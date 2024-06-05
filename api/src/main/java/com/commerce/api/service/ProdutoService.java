@@ -5,8 +5,10 @@ import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Loja;
 import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.ProdutoDTO;
+import com.commerce.api.model.dto.RequestDTO;
 import com.commerce.api.repository.LojaRepository;
 import com.commerce.api.repository.ProdutoRepository;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -74,15 +76,15 @@ public class ProdutoService {
         }
     }
 
-    public void deleteProduto(String username, Long id) {
+    public void deleteProduto(String username, RequestDTO requestDTO) {
         Loja loja = lojaRepository.findByUsername(username);
         try {
-            Produto produto = produtoRepository.findById(id).get();
+            Produto produto = produtoRepository.findById(requestDTO.id()).get();
             if (loja.equals(produto.getLoja())) {
                 produtoRepository.delete(produto);
             }
         } catch (Exception e) {
-            throw new ResourceNotFoundException("Produto (id = %d) não encontrado".formatted(id));
+            throw new ResourceNotFoundException("Produto (id = %d) não encontrado".formatted(requestDTO.id()));
         }
     }
 

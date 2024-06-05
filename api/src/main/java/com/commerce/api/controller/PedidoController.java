@@ -4,6 +4,7 @@ import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Pedido;
 import com.commerce.api.model.dto.PedidoResponseDTO;
 import com.commerce.api.model.dto.PedidoUpdateDTO;
+import com.commerce.api.model.dto.RequestDTO;
 import com.commerce.api.security.TokenService;
 import com.commerce.api.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -86,7 +87,7 @@ public class PedidoController {
         return new ResponseEntity<>(pedidoService.processarPedidos(username), HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Atualiza um pedido", description = "Modifica o status de um pedido.", tags = {
             "Pedidos"}, responses = {
             @ApiResponse(description = "Created", responseCode = "201",
@@ -104,7 +105,7 @@ public class PedidoController {
         return new ResponseEntity<>(pedidoService.updatePedido(username, dto), HttpStatus.CREATED);
     }
 
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping
     @Operation(summary = "Remove um pedido", description = "Consulta o banco de dados e remove um determinado pedido do banco de dados, a partir do número de id passado na URI.", tags = {
             "Pedidos"}, responses = {
             @ApiResponse(description = "No Content", responseCode = "204",
@@ -118,8 +119,9 @@ public class PedidoController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws Exception {
-        pedidoService.deletePedido(id);
+    public ResponseEntity<?> delete(@RequestHeader("Authorization") String token, @RequestBody RequestDTO requestDTO) throws Exception {
+        String username = tokenService.getUsernameFromToken(token);
+        pedidoService.deletePedido(username, requestDTO);
         return ResponseEntity.noContent().build();
     }
 }
