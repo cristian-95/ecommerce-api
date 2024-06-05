@@ -3,6 +3,7 @@ package com.commerce.api.model;
 import com.commerce.api.model.dto.ClienteDTO;
 import com.commerce.api.model.dto.LojaDTO;
 import com.commerce.api.validation.constraints.Telefone;
+import com.commerce.api.validation.constraints.Username;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -26,6 +27,7 @@ public class Usuario extends RepresentationModel<Usuario> implements UserDetails
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(unique = true)
+    @Username
     private String username;
     @Email(message = "E-mail em formato inválido.")
     private String email;
@@ -86,6 +88,7 @@ public class Usuario extends RepresentationModel<Usuario> implements UserDetails
         this.nome = dto.nome();
         this.telefone = dto.telefone();
         this.endereco = dto.endereco();
+        setAccountInitialProperties();
     }
 
     public Usuario(LojaDTO dto) {
@@ -95,11 +98,14 @@ public class Usuario extends RepresentationModel<Usuario> implements UserDetails
         this.nome = dto.nome();
         this.telefone = dto.telefone();
         this.endereco = dto.endereco();
+        setAccountInitialProperties();
     }
 
     public Long getId() {
         return id;
     }
+
+
 
     public void setId(Long id) {
         this.id = id;
