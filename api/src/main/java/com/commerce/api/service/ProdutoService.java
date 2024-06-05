@@ -8,7 +8,6 @@ import com.commerce.api.model.dto.ProdutoDTO;
 import com.commerce.api.model.dto.RequestDTO;
 import com.commerce.api.repository.LojaRepository;
 import com.commerce.api.repository.ProdutoRepository;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

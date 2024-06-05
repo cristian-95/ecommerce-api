@@ -29,7 +29,7 @@ public class Item {
     private CarrinhoDeCompras carrinhoDeCompras;
 
     @ManyToOne
-    @JoinColumn(name="pedido_id")
+    @JoinColumn(name = "pedido_id")
     private Pedido pedido;
 
     public Item() {
@@ -55,7 +55,6 @@ public class Item {
         this.quantidade--;
         return quantidade < 1;
     }
-
 
     public Long getId() {
         return id;

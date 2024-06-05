@@ -72,7 +72,7 @@ public class Cliente extends Usuario {
         this.genero = genero;
         this.favoritos = new ArrayList<Produto>();
         this.pedidos = new ArrayList<Pedido>();
-        this.carrinhoDeCompras = new ArrayList<CarrinhoDeCompras>(  );
+        this.carrinhoDeCompras = new ArrayList<CarrinhoDeCompras>();
     }
 
     public Cliente(String username, String email, String password, String nome, String telefone, String endereco,

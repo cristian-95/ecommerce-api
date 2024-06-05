@@ -99,7 +99,7 @@ public class PedidoService {
         try {
             Loja loja = lojaService.getProfile(username);
             Pedido pedido = this.pedidoRepository.findById(requestDTO.id()).get();
-            if (loja.equals(pedido.getLoja()));
+            if (loja.equals(pedido.getLoja()))
                 this.pedidoRepository.delete(pedido);
         } catch (Exception e) {
             throw new ResourceNotFoundException("Pedido (id = %d) não encontrado".formatted(requestDTO.id()));

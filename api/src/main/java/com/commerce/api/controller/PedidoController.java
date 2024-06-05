@@ -2,7 +2,6 @@ package com.commerce.api.controller;
 
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Pedido;
-import com.commerce.api.model.dto.PedidoResponseDTO;
 import com.commerce.api.model.dto.PedidoUpdateDTO;
 import com.commerce.api.model.dto.RequestDTO;
 import com.commerce.api.security.TokenService;

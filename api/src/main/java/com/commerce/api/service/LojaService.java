@@ -4,10 +4,8 @@ import com.commerce.api.controller.LojaController;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Loja;
 import com.commerce.api.model.Produto;
-import com.commerce.api.model.Usuario;
 import com.commerce.api.model.dto.LojaDTO;
 import com.commerce.api.model.dto.LojaUpdateDTO;
-import com.commerce.api.model.dto.RequestDTO;
 import com.commerce.api.repository.LojaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,7 +29,7 @@ public class LojaService {
     @Autowired
     private ProdutoService produtoService;
 
-    public Usuario createNewLojaAccount(Loja newLoja) {
+    public Loja createNewLojaAccount(Loja newLoja) {
 
         var saved = lojaRepository.save(newLoja);
         saved.add(linkTo(methodOn(LojaController.class).getById(saved.getId())).withSelfRel());
@@ -77,7 +75,7 @@ public class LojaService {
     }
 
     public void deleteLoja(String username) {
-        if (lojaRepository.existsByUsername(username)){
+        if (lojaRepository.existsByUsername(username)) {
             Loja loja = lojaRepository.findByUsername(username);
             lojaRepository.delete(loja);
         }

@@ -28,6 +28,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ClienteService {
 
     @Autowired
+    private AuthenticationService authenticationService;
+    @Autowired
     private PagedResourcesAssembler<Cliente> assembler;
     @Autowired
     private ClienteRepository clienteRepository;
@@ -43,14 +45,17 @@ public class ClienteService {
         return saved;
     }
 
-    public Cliente createCliente(ClienteDTO dto) throws ResourceNotFoundException {
-        Cliente cliente = new Cliente(dto);
-        String encriptedPassword = new BCryptPasswordEncoder().encode(dto.password());
-        cliente.setPassword(encriptedPassword);
-        Cliente saved = this.clienteRepository.save(cliente);
-        saved.add(linkTo(methodOn(ClienteController.class).getById(saved.getId())).withSelfRel());
-
-        return saved;
+    public Cliente createCliente(String username, ClienteDTO dto) throws ResourceNotFoundException {
+        var admin = authenticationService.loadUserByUsername(username);
+        if (admin.getAuthorities().contains("ROLE_ADMIN")) {
+            Cliente cliente = new Cliente(dto);
+            String encriptedPassword = new BCryptPasswordEncoder().encode(dto.password());
+            cliente.setPassword(encriptedPassword);
+            Cliente saved = this.clienteRepository.save(cliente);
+            saved.add(linkTo(methodOn(ClienteController.class).getById(saved.getId())).withSelfRel());
+            return saved;
+        }
+        return null;
     }
 
     public Cliente getProfile(String username) {
@@ -71,17 +76,30 @@ public class ClienteService {
     }
 
     public Cliente updateCliente(String username, ClienteUpdateDTO dto) throws ResourceNotFoundException {
+        var admin = authenticationService.loadUserByUsername(username);
+        if (admin.getAuthorities().contains("ROLE_ADMIN")) {
+            Cliente cliente = getProfile(dto.username());
+            Cliente updated = this.clienteRepository.save(updateProperties(cliente, dto));
+            updated.add(linkTo(methodOn(ClienteController.class).getById(updated.getId())).withSelfRel());
+            return updated;
+        }
+        return null;
+    }
+
+    public Cliente updateProfile(String username, ClienteUpdateDTO dto) throws ResourceNotFoundException {
         Cliente cliente = getProfile(username);
         Cliente updated = this.clienteRepository.save(updateProperties(cliente, dto));
         updated.add(linkTo(methodOn(ClienteController.class).getById(updated.getId())).withSelfRel());
         return updated;
     }
 
-    public void deleteCliente(String username) {
-        if (this.clienteRepository.existsByUsername(username)) {
+    public void deleteAccount(String username) {
+        if (this.clienteRepository.existsByUsername(username) ) {
             Cliente cliente = this.clienteRepository.findByUsername(username);
-            this.clienteRepository.delete(cliente);
-        }   
+            cliente.setAccountNonLocked(false);
+            cliente.setEnabled(false);
+            this.clienteRepository.save(cliente);
+        }
     }
 
     public CarrinhoDeCompras getCarrinho(String username) throws ResourceNotFoundException {

@@ -11,5 +11,6 @@ public interface LojaRepository extends JpaRepository<Loja, Long> {
 
     Loja findByUsername(String username);
 
-    boolean existsByUsername(String username);
+    Boolean existsByUsername(String username);
+
 }

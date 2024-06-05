@@ -35,7 +35,7 @@ import java.util.List;
 public class ClienteController {
 
     @Autowired
-    private ClienteService clienteService;    
+    private ClienteService clienteService;
     @Autowired
     private TokenService tokenService;
 
@@ -58,23 +58,8 @@ public class ClienteController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "nome"));
         return ResponseEntity.ok(clienteService.getAllClientes(pageable));
     }
-    
-    @GetMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Exibe o perfil do cliente", description = "Consulta o banco de dados e retorna um cliente a partir do username.", tags = {
-        "Clientes"}, responses = {
-            @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
-            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
-            @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
-            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-            @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-    })
-    public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String token) {
-        String username = tokenService.getUsernameFromToken(token);
-        return ResponseEntity.ok(clienteService.getProfile(username));
-    }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Registra um cliente", description = "Instancia um novo objeto do tipo Cliente e salva no banco de dados.", tags = {
             "Clientes"}, responses = {
             @ApiResponse(description = "Created", responseCode = "201", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
@@ -83,8 +68,9 @@ public class ClienteController {
             @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<Cliente> create(@RequestBody @Valid ClienteDTO dto) throws ResourceNotFoundException {
-        return new ResponseEntity<>(clienteService.createCliente(dto), HttpStatus.CREATED);
+    public ResponseEntity<Cliente> create(@RequestHeader("Authorization") String token, @RequestBody @Valid ClienteDTO dto) throws ResourceNotFoundException {
+        String username = tokenService.getUsernameFromToken(token);
+        return new ResponseEntity<>(clienteService.createCliente(username, dto), HttpStatus.CREATED);
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -99,7 +85,22 @@ public class ClienteController {
     })
     public ResponseEntity<Cliente> update(@RequestHeader(name = "Authorization") String token, @RequestBody @Valid ClienteUpdateDTO dto) throws ResourceNotFoundException {
         String username = tokenService.getUsernameFromToken(token);
-        return ResponseEntity.ok(clienteService.updateCliente(username, dto));
+        return ResponseEntity.ok(clienteService.updateProfile(username, dto));
+    }
+
+    @GetMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Exibe o perfil do cliente", description = "Consulta o banco de dados e retorna um cliente a partir do username.", tags = {
+            "Clientes"}, responses = {
+            @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+            @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
+            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+            @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+    })
+    public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String token) {
+        String username = tokenService.getUsernameFromToken(token);
+        return ResponseEntity.ok(clienteService.getProfile(username));
     }
 
     @DeleteMapping(value = "/profile")
@@ -112,9 +113,9 @@ public class ClienteController {
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    public ResponseEntity<?> delete(@RequestHeader("Authorization") String token) throws Exception {
+    public ResponseEntity<?> deletAccount(@RequestHeader("Authorization") String token) throws Exception {
         String username = tokenService.getUsernameFromToken(token);
-        clienteService.deleteCliente(username);
+        clienteService.deleteAccount(username);
         return ResponseEntity.noContent().build();
     }
 
@@ -136,22 +137,22 @@ public class ClienteController {
     @PostMapping(value = "/carrinho", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Adiciona um produto ao carrinho de compras de  um cliente", description = "Utiliza o id passado o reponse body para adicionar um produto ao carrinho de compras de um cliente.", tags = {
             "Clientes"}, responses = {
-                @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
+            @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
             @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
             @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
             @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-        })
+    })
     public ResponseEntity<CarrinhoDeCompras> adicionarAoCarrinho(@RequestHeader(name = "Authorization") String token, @RequestBody RequestDTO requestDTO)
-    throws ResourceNotFoundException {
+            throws ResourceNotFoundException {
         String username = tokenService.getUsernameFromToken(token);
         return ResponseEntity.ok(clienteService.adicionarAoCarrinho(username, requestDTO));
     }
-    
+
     @DeleteMapping(value = "/carrinho", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Remove um produto do carrinho de compras de um cliente", description = "Utiliza o id passado o reponse body para remover um produto do carrinho de compras de  um cliente.", tags = {
-        "Clientes"}, responses = {
+            "Clientes"}, responses = {
             @ApiResponse(description = "Success", responseCode = "200", content = @Content),
             @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
             @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -183,13 +184,13 @@ public class ClienteController {
     @PostMapping(value = "/favoritos", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Adiciona um produto aos favoritos de  um cliente", description = "Utiliza o id passado o reponse body para adicionar um produto aos favoritos de  um cliente.", tags = {
             "Clientes"}, responses = {
-                @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
+            @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Cliente.class)))),
             @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
             @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
             @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
             @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-        })
+    })
     public ResponseEntity<Produto> adicionarFavorito(@RequestHeader(name = "Authorization") String token, @RequestBody Long produtoId)
             throws ResourceNotFoundException {
         String username = tokenService.getUsernameFromToken(token);
@@ -208,11 +209,11 @@ public class ClienteController {
     })
     public ResponseEntity<Produto> removerFavorito(@RequestHeader(name = "Authorization") String token, @RequestBody Long produtoId)
             throws ResourceNotFoundException {
-                String username = tokenService.getUsernameFromToken(token);
+        String username = tokenService.getUsernameFromToken(token);
         return ResponseEntity.ok(clienteService.removerFavorito(username, produtoId));
     }
 
-    public ResponseEntity<?> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getById(Long id) {
         Cliente cliente;
         try {
             cliente = clienteService.getClienteById(id);

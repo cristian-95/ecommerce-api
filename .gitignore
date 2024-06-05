@@ -117,3 +117,5 @@ build/
 /api/.idea/vcs.xml
 /api/target/classes/com/commerce/api/configs/WebConfig.class
 /api/target/api.jar
+/api/target/classes/com/commerce/api/utils/GeradorPedidoCodigo.class
+/api/target/classes/com/commerce/api/model/dto/PedidoResponseDTO.class
