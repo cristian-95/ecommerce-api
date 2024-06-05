@@ -53,9 +53,9 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/clientes").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/clientes**").hasRole("ADMIN")
                                 /* Endpoints de pedidos: */
-                                .requestMatchers(HttpMethod.POST, "/pedidos").authenticated()
-                                .requestMatchers(HttpMethod.GET, "/pedidos").hasRole("USER")
-                                .requestMatchers(HttpMethod.GET, "/pedidos/{codigo}").hasRole("USER")
+                                .requestMatchers(HttpMethod.POST, "/pedidos").hasRole("USER")
+                                .requestMatchers(HttpMethod.GET, "/pedidos").hasAnyRole(new String[]{"USER", "MANAGER"})
+                                .requestMatchers(HttpMethod.GET, "/pedidos/{codigo}").hasAnyRole(new String[]{"USER", "MANAGER"})
                                 .requestMatchers(HttpMethod.PATCH, "/pedidos/{codigo}").hasRole("MANAGER")
                                 .requestMatchers(HttpMethod.DELETE, "/pedidos/{codigo}").hasRole("ADMIN")
                                 /* Endpoints de lojas: */
