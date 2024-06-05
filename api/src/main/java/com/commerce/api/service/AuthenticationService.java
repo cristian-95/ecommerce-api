@@ -1,5 +1,6 @@
 package com.commerce.api.service;
 
+import com.commerce.api.repository.AdminRepository;
 import com.commerce.api.repository.ClienteRepository;
 import com.commerce.api.repository.LojaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +16,18 @@ public class AuthenticationService implements UserDetailsService {
     private ClienteRepository clienteRepository;
     @Autowired
     private LojaRepository lojaRepository;
+    @Autowired
+    private AdminRepository adminRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserDetails user;
-        if (clienteRepository.existsByUsername(username)) {
-            user = clienteRepository.findByUsername(username);
-        } else {
+        if (adminRepository.existsByUsername(username)) {
+            user = adminRepository.findByUsername(username);
+        } else if (lojaRepository.existsByUsername(username)) {
             user = lojaRepository.findByUsername(username);
+        } else {
+            user = clienteRepository.findByUsername(username);
         }
         return user;
     }

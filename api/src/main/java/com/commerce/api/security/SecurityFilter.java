@@ -1,5 +1,6 @@
 package com.commerce.api.security;
 
+import com.commerce.api.repository.AdminRepository;
 import com.commerce.api.repository.ClienteRepository;
 import com.commerce.api.repository.LojaRepository;
 import jakarta.servlet.FilterChain;
@@ -24,6 +25,9 @@ public class SecurityFilter extends OncePerRequestFilter {
     private ClienteRepository clienteRepository;
     @Autowired
     private LojaRepository lojaRepository;
+    @Autowired
+    private AdminRepository adminRepository;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -31,21 +35,19 @@ public class SecurityFilter extends OncePerRequestFilter {
         String token = this.recoverToken(request);
         if (token != null) {
             var username = tokenService.validateToken(token);
+            UserDetails user;
 
             if (clienteRepository.existsByUsername(username)) {
-                UserDetails user = clienteRepository.findByUsername(username);
-                if (user != null) {
-                    var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
+                user = clienteRepository.findByUsername(username);
+            } else if (lojaRepository.existsByUsername(username)) {
+                user = lojaRepository.findByUsername(username);
             } else {
-                UserDetails user = lojaRepository.findByUsername(username);
-                if (user != null) {
-                    var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
+                user = adminRepository.findByUsername(username);
             }
-
+            if (user != null) {
+                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
         filterChain.doFilter(request, response);
     }

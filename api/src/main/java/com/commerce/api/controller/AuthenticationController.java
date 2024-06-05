@@ -1,15 +1,11 @@
 package com.commerce.api.controller;
 
-import com.commerce.api.model.Cliente;
-import com.commerce.api.model.Loja;
-import com.commerce.api.model.UserRole;
-import com.commerce.api.model.Usuario;
+import com.commerce.api.model.*;
 import com.commerce.api.model.dto.AuthenticationDTO;
 import com.commerce.api.model.dto.LoginResponseDTO;
 import com.commerce.api.model.dto.RegisterDTO;
-import com.commerce.api.repository.ClienteRepository;
-import com.commerce.api.repository.LojaRepository;
 import com.commerce.api.security.TokenService;
+import com.commerce.api.service.AdminService;
 import com.commerce.api.service.ClienteService;
 import com.commerce.api.service.LojaService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,15 +34,13 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private ClienteRepository clienteRepository;
-    @Autowired
-    private LojaRepository lojaRepository;
-    @Autowired
     private TokenService tokenService;
     @Autowired
     private ClienteService clienteService;
     @Autowired
     private LojaService lojaService;
+    @Autowired
+    private AdminService adminService;
 
     @SuppressWarnings("rawtypes")
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -62,9 +56,12 @@ public class AuthenticationController {
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
         try {
+            System.out.println("68");
             var auth = this.authenticationManager.authenticate(usernamePassword);
+            System.out.println("70");
             var token = tokenService.generateToken((Usuario) auth.getPrincipal());
-            return ResponseEntity.ok(new LoginResponseDTO(token));
+            System.out.println("72");
+            return ResponseEntity.ok(new LoginResponseDTO(auth.getAuthorities(), token));
         } catch (Exception e) {
             System.err.println("Erro: " + e + "\n " + e.getMessage());
             return ResponseEntity.internalServerError().build();
@@ -84,21 +81,35 @@ public class AuthenticationController {
     public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
         Usuario user;
         String encryptedPassword;
-        if (UserRole.valueOf(data.role().toUpperCase()) == UserRole.USER) {
-            if (this.clienteRepository.findByUsername(data.username()) != null)
-                return ResponseEntity.badRequest().build();
 
-            encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-            Cliente newCliente = new Cliente(data.username(), encryptedPassword, data.role().toUpperCase());
-            user = clienteService.createNewClienteAccount(newCliente);
-        } else {
-            if (this.lojaRepository.findByUsername(data.username()) != null)
-                return ResponseEntity.badRequest().build();
+        switch (UserRole.valueOf(data.role().toUpperCase())) {
+            case USER -> {
+                if (this.clienteService.getProfile(data.username()) != null)
+                    return ResponseEntity.badRequest().build();
+                encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+                Cliente newCliente = new Cliente(data.username(), encryptedPassword, data.role().toUpperCase());
+                user = clienteService.createNewClienteAccount(newCliente);
+            }
+            case MANAGER -> {
 
-            encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-            Loja newLoja = new Loja(data.username(), encryptedPassword, data.role().toUpperCase());
-            user = lojaService.createNewLojaAccount(newLoja);
+                if (this.lojaService.getProfile(data.username()) != null)
+                    return ResponseEntity.badRequest().build();
+
+                encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+                Loja newLoja = new Loja(data.username(), encryptedPassword, data.role().toUpperCase());
+                user = lojaService.createNewLojaAccount(newLoja);
+            }
+            case ADMIN -> {
+                if (this.adminService.getProfile(data.username()) != null)
+                    return ResponseEntity.badRequest().build();
+
+                encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+                Admin newAdmin = new Admin(data.username(), encryptedPassword, data.role().toUpperCase());
+                user = adminService.createNewAdminAccount(newAdmin);
+            }
+            default -> user = null;
         }
-        return ResponseEntity.ok(user);
+
+        return user != null ? ResponseEntity.ok(user) : ResponseEntity.badRequest().build();
     }
 }
