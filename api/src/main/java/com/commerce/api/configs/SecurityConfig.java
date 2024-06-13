@@ -43,7 +43,9 @@ public class SecurityConfig {
                         authorize -> authorize
                                 /* Endpoints de produtos: */
                                 .requestMatchers(HttpMethod.GET, "/produtos**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/produtos/{id}/imagens").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/produtos/{produtoId}/imagens/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/produtos/{produtoId}/imagens/**").hasRole("MANAGER")
+                                .requestMatchers(HttpMethod.DELETE, "/produtos/{produtoId}/imagens/**").hasRole("MANAGER")
 
                                 .requestMatchers(HttpMethod.POST, "/produtos").hasRole("MANAGER")
                                 .requestMatchers(HttpMethod.PUT, "/produtos").hasRole("MANAGER")

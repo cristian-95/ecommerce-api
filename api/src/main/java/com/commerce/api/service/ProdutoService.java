@@ -74,16 +74,21 @@ public class ProdutoService {
         }
         Produto produto = new Produto(dto);
         produto.setLoja(loja);
+        Produto saved = produtoRepository.save(produto);
 
         if (imagens.length > 0) {
             List<Imagem> imagemList = new ArrayList<>();
+            System.out.println("tem imagem");
+            System.out.println(imagens.length);
             for (MultipartFile img : imagens) {
-                imagemList.add(
-                        imagemService.adicionarImagem(username, produto.getId(), img)
-                );
+                Imagem imagem = imagemService.adicionarImagem(username, saved.getId(), img);
+                System.out.println("imagemService: " + imagem);
+                imagemList.add(imagem);
+
             }
+            imagemList.forEach(System.out::println);
         }
-        Produto saved = produtoRepository.save(produto);
+        saved = produtoRepository.save(produto);
         saved.add(linkTo(methodOn(ProdutoController.class).getById(saved.getId())).withSelfRel());
         return saved;
 
@@ -130,8 +135,7 @@ public class ProdutoService {
     }
 
     private boolean verificarPermissao(String username, Long produtoId) {
-        if (!adminService.isAdmin(username)) return false;
-        if (!lojaRepository.existsByUsername(username)) return false;
+        if (!adminService.isAdmin(username) || !lojaRepository.existsByUsername(username)) return false;
         Loja loja = lojaRepository.findByUsername(username);
         Produto produto = this.produtoRepository.findById(produtoId).orElseThrow();
         return produto.getLoja().equals(loja);

@@ -37,14 +37,16 @@ public class ImagemService {
         this.produtoRepository = produtoRepository;
         this.lojaRepository = lojaRepository;
         this.adminService = adminService;
-        this.fileStorageLocation = Paths.get("./imagens/produtos/").toAbsolutePath().normalize();
+        this.fileStorageLocation = Paths.get("./storage/imagens/produtos/").toAbsolutePath().normalize();
 
     }
 
     public Imagem adicionarImagem(String username, Long produtoId, MultipartFile imagemMultiPart) {
         if (!verificarPermissao(username, produtoId)) {
+            System.out.println("adcionarImagem:deu ruim");
             return null;
         }
+        System.out.println("ok" + imagemMultiPart.getName());
 
         Produto produto = this.produtoRepository.findById(produtoId).orElseThrow();
         Imagem imagem = multipartParaImagem(imagemMultiPart, produto);
@@ -112,8 +114,8 @@ public class ImagemService {
     }
 
     private boolean verificarPermissao(String username, Long produtoId) {
-        if (!adminService.isAdmin(username)) return false;
-        if (!lojaRepository.existsByUsername(username)) return false;
+        if (adminService.isAdmin(username)) return true;
+        System.out.println("118");
         Loja loja = lojaRepository.findByUsername(username);
         Produto produto = this.produtoRepository.findById(produtoId).orElseThrow();
         return produto.getLoja().equals(loja);
