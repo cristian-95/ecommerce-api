@@ -1,7 +1,6 @@
 package com.commerce.api.configs;
 
 import com.commerce.api.security.SecurityFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,9 +26,12 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private SecurityFilter securityFilter;
 
+    private final SecurityFilter securityFilter;
+
+    public SecurityConfig(SecurityFilter securityFilter) {
+        this.securityFilter = securityFilter;
+    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,9 +43,12 @@ public class SecurityConfig {
                         authorize -> authorize
                                 /* Endpoints de produtos: */
                                 .requestMatchers(HttpMethod.GET, "/produtos**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/produtos/{id}/imagens").permitAll()
+
                                 .requestMatchers(HttpMethod.POST, "/produtos").hasRole("MANAGER")
                                 .requestMatchers(HttpMethod.PUT, "/produtos").hasRole("MANAGER")
                                 .requestMatchers(HttpMethod.DELETE, "/produtos/{id}").hasRole("MANAGER")
+                                .requestMatchers(HttpMethod.POST, "/produtos/{id}/imagens").hasRole("MANAGER")
                                 /* Endpoints de clientes: */
                                 .requestMatchers("/clientes/carrinho").hasRole("USER")
                                 .requestMatchers("/clientes/favoritos").hasRole("USER")

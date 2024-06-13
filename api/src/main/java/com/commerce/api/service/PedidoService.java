@@ -6,7 +6,7 @@ import com.commerce.api.model.dto.PedidoUpdateDTO;
 import com.commerce.api.model.dto.RequestDTO;
 import com.commerce.api.repository.ItemRepository;
 import com.commerce.api.repository.PedidoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.commerce.api.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,17 +18,21 @@ import java.util.stream.Collectors;
 @Service
 public class PedidoService {
 
-    @Autowired
-    private PedidoRepository pedidoRepository;
-    @Autowired
-    private CarrinhoDeComprasService carrinhoDeComprasService;
-    @Autowired
-    private LojaService lojaService;
-    @Autowired
-    private ClienteService clienteService;
-    @Autowired
-    private ItemRepository itemRepository;
+    private final PedidoRepository pedidoRepository;
+    private final ProdutoRepository produtoRepository;
+    private final CarrinhoDeComprasService carrinhoDeComprasService;
+    private final LojaService lojaService;
+    private final ClienteService clienteService;
+    private final ItemRepository itemRepository;
 
+    public PedidoService(PedidoRepository pedidoRepository, CarrinhoDeComprasService carrinhoDeComprasService, LojaService lojaService, ClienteService clienteService, ItemRepository itemRepository, ProdutoRepository produtoRepository) {
+        this.pedidoRepository = pedidoRepository;
+        this.carrinhoDeComprasService = carrinhoDeComprasService;
+        this.lojaService = lojaService;
+        this.clienteService = clienteService;
+        this.itemRepository = itemRepository;
+        this.produtoRepository = produtoRepository;
+    }
 
     public List<Pedido> getAllPedidos(String username) {
         List<Pedido> pedidos;
@@ -78,7 +82,6 @@ public class PedidoService {
         }
         CarrinhoDeCompras novoCarrinho = new CarrinhoDeCompras(cliente);
         criarCarrinhoNovo(carrinhoDeCompras, novoCarrinho, cliente);
-//        removerCarrinhoAntigo(carrinhoDeCompras);
 
         this.clienteService.save(cliente);
         return pedidos;
@@ -120,14 +123,17 @@ public class PedidoService {
         itens.forEach(i -> {
             Item item = itemRepository.findById(i.getId()).get();
             item.setPedido(pedido);
+
+            Produto produto = item.getProduto();
+            Integer estoque = produto.getQtdeEstoque();
+            estoque -= item.getQuantidade();
+            produto.setQtdeEstoque(estoque);
+
+            produtoRepository.save(produto);
             itemRepository.save(item);
         });
 
         this.lojaService.save(loja);
-    }
-
-    private void removerCarrinhoAntigo(CarrinhoDeCompras carrinho) {
-        this.carrinhoDeComprasService.remover(carrinho);
     }
 
     private void criarCarrinhoNovo(CarrinhoDeCompras carrinhoDeCompras, CarrinhoDeCompras novoCarrinho, Cliente cliente) {

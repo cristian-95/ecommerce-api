@@ -3,7 +3,6 @@ package com.commerce.api.service;
 import com.commerce.api.repository.AdminRepository;
 import com.commerce.api.repository.ClienteRepository;
 import com.commerce.api.repository.LojaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,12 +11,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticationService implements UserDetailsService {
 
-    @Autowired
-    private ClienteRepository clienteRepository;
-    @Autowired
-    private LojaRepository lojaRepository;
-    @Autowired
-    private AdminRepository adminRepository;
+    private final ClienteRepository clienteRepository;
+    private final LojaRepository lojaRepository;
+    private final AdminRepository adminRepository;
+
+    public AuthenticationService(ClienteRepository clienteRepository, LojaRepository lojaRepository, AdminRepository adminRepository) {
+        this.clienteRepository = clienteRepository;
+        this.lojaRepository = lojaRepository;
+        this.adminRepository = adminRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

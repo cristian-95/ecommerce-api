@@ -13,6 +13,7 @@ public record ProdutoDTO(
         HashMap<String, String> specs,
         Double preco,
         @Min(0)
-        Long qtdeEstoque
+        Integer qtdeEstoque,
+        Long lojaId
 ) {
 }

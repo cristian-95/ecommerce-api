@@ -1,6 +1,9 @@
 server:
   port: 8080
 
+file:
+  upload-dir: ./storage
+
 spring:
   application:
     name: e-commerce-api
@@ -17,6 +20,12 @@ spring:
     open-in-view: true
     hibernate:
       ddl-auto: update
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 4MB
+      max-request-size: 20MB
 
 # Configurações de segurança:
 e-commerce-api:
@@ -39,5 +48,6 @@ springdoc:
     - /pedidos/**
     - /auth/login
     - /auth/register
+    - /admin
   swagger-ui:
     path: /

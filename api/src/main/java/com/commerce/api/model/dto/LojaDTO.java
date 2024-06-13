@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.br.CNPJ;
 public record LojaDTO(
         Long id,
         String username,
+        @Column(nullable = true)
         @Email(message = "E-mail em formato inválido.")
         String email,
         String password,
@@ -16,7 +17,9 @@ public record LojaDTO(
         String telefone,
         String endereco,
         String nome,
+        String descricao,
         @CNPJ
+        @Column(nullable = true)
         String CNPJ
 ) {
 }

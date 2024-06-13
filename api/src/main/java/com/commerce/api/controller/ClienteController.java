@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,10 +33,13 @@ import java.util.List;
 @RequestMapping("/clientes")
 public class ClienteController {
 
-    @Autowired
-    private ClienteService clienteService;
-    @Autowired
-    private TokenService tokenService;
+    private final ClienteService clienteService;
+    private final TokenService tokenService;
+
+    public ClienteController(ClienteService clienteService, TokenService tokenService) {
+        this.clienteService = clienteService;
+        this.tokenService = tokenService;
+    }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Lista todos os clientes", description = "Consulta o banco de dados e retorna todos os clientes.", tags = {

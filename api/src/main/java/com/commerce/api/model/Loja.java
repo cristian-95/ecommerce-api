@@ -4,6 +4,7 @@ import com.commerce.api.model.dto.LojaDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -11,6 +12,7 @@ import org.hibernate.validator.constraints.br.CNPJ;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "lojas")
@@ -24,6 +26,9 @@ public class Loja extends Usuario {
     @OneToMany(mappedBy = "loja")
     @JsonManagedReference
     private List<Produto> produtos;
+
+    @Column(length = 1000)
+    private String descricao;
 
     @JsonIgnore
     @OneToMany(mappedBy = "loja")
@@ -48,10 +53,11 @@ public class Loja extends Usuario {
         this.pedidos = new ArrayList<>();
     }
 
-    public Loja(String username, String email, String password, String nome, String telefone, String endereco,
+    public Loja(String username, String email, String password, String nome, String descricao, String telefone, String endereco,
                 UserRole role, String cNPJ) {
         super(username, email, password, nome, telefone, endereco, role);
         CNPJ = cNPJ;
+        this.descricao = descricao;
         this.produtos = new ArrayList<>();
         this.pedidos = new ArrayList<>();
     }
@@ -62,6 +68,10 @@ public class Loja extends Usuario {
         CNPJ = cNPJ;
         this.produtos = produtos;
         this.pedidos = pedidos;
+    }
+
+    public void adicionarPedido(Pedido pedido) {
+        this.pedidos.add(pedido);
     }
 
     public String getCNPJ() {
@@ -88,54 +98,24 @@ public class Loja extends Usuario {
         this.pedidos = pedidos;
     }
 
-    public void adicionarProduto(Produto produto) {
-        if (!this.produtos.contains(produto)) {
-            this.produtos.add(produto);
-        }
+    public String getDescricao() {
+        return descricao;
     }
 
-    public void removerProduto(Produto produto) {
-        if (!this.produtos.contains(produto)) {
-            this.produtos.remove(produto);
-        }
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
-    public void adicionarPedido(Pedido pedido) {
-        this.pedidos.add(pedido);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Loja loja)) return false;
+        if (!super.equals(o)) return false;
+        return Objects.equals(CNPJ, loja.CNPJ);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((CNPJ == null) ? 0 : CNPJ.hashCode());
-        result = prime * result + ((produtos == null) ? 0 : produtos.hashCode());
-        result = prime * result + ((pedidos == null) ? 0 : pedidos.hashCode());
-        return result;
+        return Objects.hash(super.hashCode(), CNPJ);
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Loja other = (Loja) obj;
-        if (CNPJ == null) {
-            if (other.CNPJ != null)
-                return false;
-        } else if (!CNPJ.equals(other.CNPJ))
-            return false;
-        if (produtos == null) {
-            if (other.produtos != null)
-                return false;
-        } else if (!produtos.equals(other.produtos))
-            return false;
-        if (pedidos == null) {
-            return other.pedidos == null;
-        } else return pedidos.equals(other.pedidos);
-    }
-
 }

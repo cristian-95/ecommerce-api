@@ -7,7 +7,6 @@ import com.commerce.api.model.Item;
 import com.commerce.api.model.Produto;
 import com.commerce.api.repository.CarrinhoDeComprasRepository;
 import com.commerce.api.repository.ItemRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -16,12 +15,15 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Service
 public class CarrinhoDeComprasService {
 
-    @Autowired
-    private CarrinhoDeComprasRepository carrinhoDeComprasRepository;
-    @Autowired
-    private ProdutoService produtoService;
-    @Autowired
-    private ItemRepository itemRepository;
+    private final CarrinhoDeComprasRepository carrinhoDeComprasRepository;
+    private final ProdutoService produtoService;
+    private final ItemRepository itemRepository;
+
+    public CarrinhoDeComprasService(CarrinhoDeComprasRepository carrinhoDeComprasRepository, ProdutoService produtoService, ItemRepository itemRepository) {
+        this.carrinhoDeComprasRepository = carrinhoDeComprasRepository;
+        this.produtoService = produtoService;
+        this.itemRepository = itemRepository;
+    }
 
     public void save(CarrinhoDeCompras carrinhoDeCompras) {
         this.carrinhoDeComprasRepository.save(carrinhoDeCompras);

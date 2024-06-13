@@ -1,9 +1,7 @@
 package com.commerce.api.model;
 
 import com.commerce.api.model.dto.ProdutoDTO;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -11,12 +9,13 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @Entity
 @Table(name = "produtos")
-@JsonPropertyOrder({"id", "nome", "descricao", "preco", "especificacoes", "qtdeEstoque"})
+@JsonPropertyOrder({"id", "nome", "descricao", "preco", "specs", "qtdeEstoque","imagens"})
 @Relation(collectionRelation = "produtos")
 public class Produto extends RepresentationModel<Produto> implements Serializable {
 
@@ -26,12 +25,12 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
 
     @Size(min = 2, max = 80)
     private String nome;
+    @Column(length = 1000)
     private String descricao;
     private HashMap<String, String> specs;
     private Double preco;
-
     @Min(0)
-    private Long qtdeEstoque;
+    private Integer qtdeEstoque;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "favoritos")
@@ -41,16 +40,20 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
     @OneToMany(mappedBy = "produto", cascade = CascadeType.REMOVE)
     private List<Item> itens;
 
-
     @JsonIncludeProperties({"id", "nome"})
     @ManyToOne
     @JoinColumn(name = "loja_id")
     private Loja loja;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private final List<Imagem> imagens;
+
     public Produto() {
+        this.imagens = new ArrayList<>();
     }
 
-    public Produto(Long id, String nome, HashMap<String, String> specs, Double preco, Long qtdeEstoque,
+    public Produto(Long id, String nome, HashMap<String, String> specs, Double preco, Integer qtdeEstoque,
                    String descricao) {
         this.id = id;
         this.nome = nome;
@@ -58,15 +61,24 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
         this.descricao = descricao;
         this.preco = preco;
         this.qtdeEstoque = qtdeEstoque;
+        this.imagens = new ArrayList<>();
     }
 
     public Produto(ProdutoDTO dto) {
-        this.id = dto.id();
         this.nome = dto.nome();
         this.specs = dto.specs();
         this.descricao = dto.descricao();
         this.preco = dto.preco();
         this.qtdeEstoque = dto.qtdeEstoque();
+        this.imagens = new ArrayList<>();
+    }
+
+    public void adicionarImagem(Imagem imagem) {
+        this.imagens.add(imagem);
+    }
+
+    public void removerImagem(Imagem imagem) {
+        this.imagens.remove(imagem);
     }
 
     public Long getId() {
@@ -109,11 +121,11 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
         this.preco = preco;
     }
 
-    public Long getQtdeEstoque() {
+    public Integer getQtdeEstoque() {
         return qtdeEstoque;
     }
 
-    public void setQtdeEstoque(Long qtdeEstoque) {
+    public void setQtdeEstoque(Integer qtdeEstoque) {
         this.qtdeEstoque = qtdeEstoque;
     }
 
@@ -133,6 +145,9 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
         this.loja = loja;
     }
 
+    public List<Imagem> getImagens() {
+        return imagens;
+    }
 
     @Override
     public int hashCode() {

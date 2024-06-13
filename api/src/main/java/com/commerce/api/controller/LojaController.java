@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,10 +30,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/lojas")
 public class LojaController {
 
-    @Autowired
-    private LojaService lojaService;
-    @Autowired
-    private TokenService tokenService;
+    private final LojaService lojaService;
+    private final TokenService tokenService;
+
+    public LojaController(LojaService lojaService, TokenService tokenService) {
+        this.lojaService = lojaService;
+        this.tokenService = tokenService;
+    }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Lista todas as lojas", description = "Consulta o banco de dados e retorna todas as lojas.", tags = {
@@ -49,10 +51,11 @@ public class LojaController {
     public ResponseEntity<PagedModel<EntityModel<Loja>>> getAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size,
-            @RequestParam(value = "direction", defaultValue = "asc") String direction) {
+            @RequestParam(value = "direction", defaultValue = "asc") String direction,
+            @RequestParam(value = "searchKey", defaultValue = "") String searchKey) {
         var sortDirection = "DESC".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "nome"));
-        return ResponseEntity.ok(lojaService.getAllLojas(pageable));
+        return ResponseEntity.ok(lojaService.getAllLojas(pageable, searchKey));
     }
 
     @GetMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)

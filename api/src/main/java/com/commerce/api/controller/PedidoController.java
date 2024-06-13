@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +25,13 @@ import java.util.List;
 @RequestMapping("/pedidos")
 public class PedidoController {
 
-    @Autowired
-    private PedidoService pedidoService;
-    @Autowired
-    private TokenService tokenService;
+    private final PedidoService pedidoService;
+    private final TokenService tokenService;
+
+    public PedidoController(PedidoService pedidoService, TokenService tokenService) {
+        this.pedidoService = pedidoService;
+        this.tokenService = tokenService;
+    }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Lista todos os pedidos do perfil", description = "Consulta o banco de dados e retorna todos os pedidos do perfil.", tags = {

@@ -9,7 +9,6 @@ import com.commerce.api.model.dto.ClienteDTO;
 import com.commerce.api.model.dto.ClienteUpdateDTO;
 import com.commerce.api.model.dto.RequestDTO;
 import com.commerce.api.repository.ClienteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -27,16 +26,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Service
 public class ClienteService {
 
-    @Autowired
-    private AuthenticationService authenticationService;
-    @Autowired
-    private PagedResourcesAssembler<Cliente> assembler;
-    @Autowired
-    private ClienteRepository clienteRepository;
-    @Autowired
-    private ProdutoService produtoService;
-    @Autowired
-    private CarrinhoDeComprasService carrinhoDeComprasService;
+    private final AuthenticationService authenticationService;
+    private final PagedResourcesAssembler<Cliente> assembler;
+    private final ClienteRepository clienteRepository;
+    private final ProdutoService produtoService;
+    private final CarrinhoDeComprasService carrinhoDeComprasService;
+
+    public ClienteService(AuthenticationService authenticationService, PagedResourcesAssembler<Cliente> assembler, ClienteRepository clienteRepository, ProdutoService produtoService, CarrinhoDeComprasService carrinhoDeComprasService) {
+        this.authenticationService = authenticationService;
+        this.assembler = assembler;
+        this.clienteRepository = clienteRepository;
+        this.produtoService = produtoService;
+        this.carrinhoDeComprasService = carrinhoDeComprasService;
+    }
 
     public Cliente createNewClienteAccount(Cliente newCliente) {
         newCliente.setCarrinhoDeCompras(List.of(new CarrinhoDeCompras()));
@@ -94,7 +96,7 @@ public class ClienteService {
     }
 
     public void deleteAccount(String username) {
-        if (this.clienteRepository.existsByUsername(username) ) {
+        if (this.clienteRepository.existsByUsername(username)) {
             Cliente cliente = this.clienteRepository.findByUsername(username);
             cliente.setAccountNonLocked(false);
             cliente.setEnabled(false);

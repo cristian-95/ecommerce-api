@@ -7,7 +7,6 @@ import com.commerce.api.model.Produto;
 import com.commerce.api.model.dto.LojaDTO;
 import com.commerce.api.model.dto.LojaUpdateDTO;
 import com.commerce.api.repository.LojaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -22,15 +21,18 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Service
 public class LojaService {
 
-    @Autowired
-    PagedResourcesAssembler<Loja> assembler;
-    @Autowired
-    private LojaRepository lojaRepository;
-    @Autowired
-    private ProdutoService produtoService;
+
+    private final PagedResourcesAssembler<Loja> assembler;
+    private final LojaRepository lojaRepository;
+    private final ProdutoService produtoService;
+
+    public LojaService(PagedResourcesAssembler<Loja> assembler, LojaRepository lojaRepository, ProdutoService produtoService) {
+        this.assembler = assembler;
+        this.lojaRepository = lojaRepository;
+        this.produtoService = produtoService;
+    }
 
     public Loja createNewLojaAccount(Loja newLoja) {
-
         var saved = lojaRepository.save(newLoja);
         saved.add(linkTo(methodOn(LojaController.class).getById(saved.getId())).withSelfRel());
         return saved;
@@ -50,24 +52,29 @@ public class LojaService {
         return lojaRepository.findByUsername(username);
     }
 
-    public PagedModel<EntityModel<Loja>> getAllLojas(Pageable pageable) {
-        Page<Loja> lojas = lojaRepository.findAll(pageable);
+    public PagedModel<EntityModel<Loja>> getAllLojas(Pageable pageable, String searchKey) {
+        Page<Loja> lojas;
+        if (searchKey.isBlank()) {
+            lojas = lojaRepository.findAll(pageable);
+        } else {
+            lojas = lojaRepository.findByNomeOrDescricao(searchKey, searchKey, pageable);
+        }
         lojas.forEach(c -> c.add(linkTo(methodOn(LojaController.class).getById(c.getId())).withSelfRel()));
-
         return assembler.toModel(lojas);
-
     }
 
     public Loja getLojaById(Long id) throws ResourceNotFoundException {
         Loja loja = lojaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Loja não encontrada."));
-        loja.add(linkTo(methodOn(LojaController.class).getAll(0, 0, "asc")).withRel("Listagem"));
+        loja.add(linkTo(methodOn(LojaController.class).getAll(0, 0, "asc", "")).withRel("Listagem"));
 
         return loja;
     }
 
     public Loja updateLoja(String username, LojaUpdateDTO dto) throws ResourceNotFoundException {
         Loja loja = lojaRepository.findByUsername(username);
+
+
         Loja updated = lojaRepository.save(updateProperties(loja, dto));
         updated.add(linkTo(methodOn(LojaController.class).getById(updated.getId())).withSelfRel());
 
@@ -93,11 +100,11 @@ public class LojaService {
     private Loja updateProperties(Loja loja, LojaUpdateDTO dto) {
 
         loja.setNome(dto.nome() != null ? dto.nome() : loja.getNome());
+        loja.setDescricao(dto.descricao() != null ? dto.descricao() : loja.getDescricao());
         loja.setCNPJ(dto.CNPJ() != null ? dto.CNPJ() : loja.getCNPJ());
         loja.setEmail(dto.email() != null ? dto.email() : loja.getEmail());
         loja.setTelefone(dto.telefone() != null ? dto.telefone() : loja.getTelefone());
         loja.setEndereco(dto.endereco() != null ? dto.endereco() : loja.getEndereco());
-
         return loja;
     }
 

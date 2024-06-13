@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,16 +30,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthenticationController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private TokenService tokenService;
-    @Autowired
-    private ClienteService clienteService;
-    @Autowired
-    private LojaService lojaService;
-    @Autowired
-    private AdminService adminService;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
+    private final ClienteService clienteService;
+    private final LojaService lojaService;
+    private final AdminService adminService;
+
+    public AuthenticationController(AuthenticationManager authenticationManager, TokenService tokenService, ClienteService clienteService, LojaService lojaService, AdminService adminService) {
+        this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
+        this.clienteService = clienteService;
+        this.lojaService = lojaService;
+        this.adminService = adminService;
+    }
 
     @SuppressWarnings("rawtypes")
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -56,11 +58,8 @@ public class AuthenticationController {
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
         try {
-            System.out.println("68");
             var auth = this.authenticationManager.authenticate(usernamePassword);
-            System.out.println("70");
             var token = tokenService.generateToken((Usuario) auth.getPrincipal());
-            System.out.println("72");
             return ResponseEntity.ok(new LoginResponseDTO(auth.getAuthorities(), token));
         } catch (Exception e) {
             System.err.println("Erro: " + e + "\n " + e.getMessage());
