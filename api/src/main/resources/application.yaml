@@ -1,9 +1,6 @@
 server:
   port: 8080
 
-file:
-  upload-dir: ./storage
-
 spring:
   application:
     name: e-commerce-api
@@ -13,8 +10,8 @@ spring:
   # Configurações do Postgres:
   datasource:
     url: jdbc:postgresql://localhost:5432/e_commerce_api_db
-    username: postgres
-    password: admin123
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     open-in-view: true
@@ -31,7 +28,7 @@ spring:
 e-commerce-api:
   security:
     token:
-      secret: api-secret-text------123456789
+      secret: ${API_SECRET}
 
 # Configurações do SpringDoc:
 springdoc:
@@ -48,6 +45,5 @@ springdoc:
     - /pedidos/**
     - /auth/login
     - /auth/register
-    - /admin
   swagger-ui:
     path: /
