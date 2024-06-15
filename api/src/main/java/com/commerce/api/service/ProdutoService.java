@@ -1,5 +1,6 @@
 package com.commerce.api.service;
 
+import com.commerce.api.controller.ImagemController;
 import com.commerce.api.controller.ProdutoController;
 import com.commerce.api.exception.ResourceNotFoundException;
 import com.commerce.api.model.Admin;
@@ -10,6 +11,7 @@ import com.commerce.api.model.dto.ProdutoDTO;
 import com.commerce.api.model.dto.RequestDTO;
 import com.commerce.api.repository.LojaRepository;
 import com.commerce.api.repository.ProdutoRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -43,7 +45,7 @@ public class ProdutoService {
         this.imagemService = imagemService;
     }
 
-    public PagedModel<EntityModel<Produto>> getAllProdutos(Pageable pageable, String searchKey) {
+    public PagedModel<EntityModel<Produto>> getAllProdutos(Pageable pageable, String searchKey, HttpServletRequest request) {
         Page<Produto> produtos;
         if (searchKey.isBlank()) {
             produtos = produtoRepository.findAll(pageable);
@@ -53,13 +55,15 @@ public class ProdutoService {
         }
         produtos.forEach(p -> {
             p.add(linkTo(methodOn(ProdutoController.class).getById(p.getId())).withSelfRel());
+            p.getImagens().forEach( i-> i.add(linkTo(methodOn(ImagemController.class).downloadImagem(p.getId(), i.getId(),request)).withRel("download")));
+
         });
         return assembler.toModel(produtos);
     }
 
     public Produto getProdutoById(Long id) throws ResourceNotFoundException {
         Produto produto = produtoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
-        produto.add(linkTo(methodOn(ProdutoController.class).getAll(0, 0, "", "")).withRel("Listagem"));
+        produto.add(linkTo(methodOn(ProdutoController.class).getAll(0, 0, "", "", null)).withRel("Listagem"));
 
         return produto;
     }
@@ -91,7 +95,6 @@ public class ProdutoService {
         saved = produtoRepository.save(produto);
         saved.add(linkTo(methodOn(ProdutoController.class).getById(saved.getId())).withSelfRel());
         return saved;
-
     }
 
     public Produto updateProduto(String username, ProdutoDTO dto) throws ResourceNotFoundException {

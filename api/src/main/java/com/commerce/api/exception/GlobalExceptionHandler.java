@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         List<ErrorMessage> errorMessages = getValidationErrorList(ex.getBindingResult());
         return handleExceptionInternal(ex, errorMessages, headers, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<ErrorMessage> handleIOException(IOException ex) {
+        ErrorMessage errorMessage = new ErrorMessage(ex.getMessage(), 404);
+        return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
     }
 
     private List<ErrorMessage> getValidationErrorList(BindingResult bindingResult) {

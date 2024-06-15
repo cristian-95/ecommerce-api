@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -28,18 +29,21 @@ public class ImagemController {
         this.tokenService = tokenService;
     }
 
-    @PostMapping
-    @Operation(summary = "Adiciona uma imagem", tags = {"Produtos"})
-    public ResponseEntity<Imagem> addImagem(@RequestHeader("Authorization") String token, @PathVariable Long produtoId, @RequestParam("file") MultipartFile file) {
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "Adiciona uma imagem a um produto", tags = {"Produtos"})
+    public ResponseEntity<List<Imagem>> addImagem(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Long produtoId,
+            @RequestPart("file") MultipartFile[] files) {
         String username = tokenService.getUsernameFromToken(token);
-        Imagem imagem = imagemService.adicionarImagem(username, produtoId, file);
-        return new ResponseEntity<>(imagem, HttpStatus.CREATED);
+        List<Imagem> imagens = imagemService.adicionarImagens(username, produtoId, files);
+        return new ResponseEntity<>(imagens, HttpStatus.CREATED);
     }
 
     @GetMapping
     @Operation(summary = "Recupera imagens por produto", tags = {"Produtos"})
-    public ResponseEntity<List<Imagem>> getImagensByProduto(@PathVariable Long produtoId) {
-        return ResponseEntity.ok(imagemService.getImagensByProduto(produtoId));
+    public ResponseEntity<List<Imagem>> getImagensByProduto(@PathVariable Long produtoId, HttpServletRequest request) {
+        return ResponseEntity.ok(imagemService.getImagensByProduto(produtoId, request));
     }
 
     @GetMapping("/{imagemId}")
@@ -72,7 +76,7 @@ public class ImagemController {
 
     @DeleteMapping("/{imagemId}")
     @Operation(summary = "Remove imagem por id", tags = {"Produtos"})
-    public ResponseEntity<Void> deleteImagem(@RequestHeader("Authorization") String token, @PathVariable Long produtoId, @PathVariable Long imagemId) {
+    public ResponseEntity<Void> deleteImagem(@RequestHeader("Authorization") String token, @PathVariable Long produtoId, @PathVariable Long imagemId) throws IOException {
         String username = tokenService.getUsernameFromToken(token);
         imagemService.deleteImagem(username, produtoId, imagemId);
         return ResponseEntity.noContent().build();

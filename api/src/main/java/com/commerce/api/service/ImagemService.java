@@ -8,6 +8,7 @@ import com.commerce.api.model.Produto;
 import com.commerce.api.repository.ImagemRepository;
 import com.commerce.api.repository.LojaRepository;
 import com.commerce.api.repository.ProdutoRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -41,6 +45,15 @@ public class ImagemService {
 
     }
 
+    public List<Imagem> adicionarImagens(String username, Long produtoId, MultipartFile[] imagemMultiPartArray) {
+        List<Imagem> imagens = new ArrayList<>();
+        Arrays.stream(imagemMultiPartArray).forEach(i -> {
+            Imagem img = this.adicionarImagem(username, produtoId, i);
+            if (img != null) imagens.add(img);
+        });
+        return imagens;
+    }
+
     public Imagem adicionarImagem(String username, Long produtoId, MultipartFile imagemMultiPart) {
         if (!verificarPermissao(username, produtoId)) {
             System.out.println("adcionarImagem:deu ruim");
@@ -58,11 +71,11 @@ public class ImagemService {
         return saved;
     }
 
-    public List<Imagem> getImagensByProduto(Long produtoId) {
+    public List<Imagem> getImagensByProduto(Long produtoId, HttpServletRequest request) {
         List<Imagem> imagens = imagemRepository.findByProdutoId(produtoId);
         imagens.forEach(i -> {
             i.add(linkTo(methodOn(ImagemController.class).getImagemById(produtoId, i.getId())).withSelfRel());
-            i.add(linkTo(methodOn(ImagemController.class).downloadImagem(produtoId, i.getId(), null)).withRel("download"));
+            i.add(linkTo(methodOn(ImagemController.class).downloadImagem(produtoId, i.getId(), request)).withRel("download"));
         });
         return imagens;
     }
@@ -77,7 +90,6 @@ public class ImagemService {
         Imagem imagem = this.getImagemById(produtoId, imagemId);
         try {
             Path filePath = Paths.get(imagem.getPath());
-            System.out.println(filePath);
             Resource resource = new UrlResource(filePath.toAbsolutePath().toUri());
             if (resource.exists()) return resource;
             else throw new FileNotFoundException("Imagem não encontrada");
@@ -87,9 +99,15 @@ public class ImagemService {
         return null;
     }
 
-    public void deleteImagem(String username, Long produtoId, Long imagemId) {
+    public void deleteImagem(String username, Long produtoId, Long imagemId) throws IOException {
         if (verificarPermissao(username, produtoId)) {
             Imagem imagem = this.getImagemById(produtoId, imagemId);
+            try {
+                if (imagem != null) Files.delete(Paths.get(imagem.getPath()));
+            } catch (IOException ex) {
+                throw new IOException("Imagem não está no servidor");
+            }
+            assert imagem != null;
             this.imagemRepository.delete(imagem);
         }
     }
@@ -115,7 +133,6 @@ public class ImagemService {
 
     private boolean verificarPermissao(String username, Long produtoId) {
         if (adminService.isAdmin(username)) return true;
-        System.out.println("118");
         Loja loja = lojaRepository.findByUsername(username);
         Produto produto = this.produtoRepository.findById(produtoId).orElseThrow();
         return produto.getLoja().equals(loja);
