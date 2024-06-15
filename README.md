@@ -25,19 +25,29 @@ Este projeto implementa a API de back-end para uma plataforma de e-commerce que 
    cd ecommerce-api/api
    ```
 
-3. Instale as dependências do projeto:
+3. Configure as  variaveis de ambiente: 
+
+   ```Bash
+   export DB_USER=      # usuario do postgres 
+   export DB_PASSWORD=  # senha do postgres
+   export API_SECRET=   # seed do algoritmo de encriptação
+   ```
+   *(Também pode ser feito nas configurações de execução do Intellij)*
+
+
+4. Instale as dependências do projeto:
 
    ```Bash
    mvn install
    ```
 
-4. Execute a aplicação Spring Boot:
+5. Execute a aplicação Spring Boot:
 
    ```Bash
    mvn spring-boot:run
    ```
 
-5. Acesse a aplicação na URL: http://localhost:8080
+6. Acesse a aplicação na URL: http://localhost:8080
 
    - Utilize a collection do postman para testar,
 
