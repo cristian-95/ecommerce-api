@@ -77,17 +77,6 @@ public class ClienteService {
         return cliente;
     }
 
-    public Cliente updateCliente(String username, ClienteUpdateDTO dto) throws ResourceNotFoundException {
-        var admin = authenticationService.loadUserByUsername(username);
-        if (admin.getAuthorities().contains("ROLE_ADMIN")) {
-            Cliente cliente = getProfile(dto.username());
-            Cliente updated = this.clienteRepository.save(updateProperties(cliente, dto));
-            updated.add(linkTo(methodOn(ClienteController.class).getById(updated.getId())).withSelfRel());
-            return updated;
-        }
-        return null;
-    }
-
     public Cliente updateProfile(String username, ClienteUpdateDTO dto) throws ResourceNotFoundException {
         Cliente cliente = getProfile(username);
         Cliente updated = this.clienteRepository.save(updateProperties(cliente, dto));

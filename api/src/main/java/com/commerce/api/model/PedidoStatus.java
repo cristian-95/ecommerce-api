@@ -15,5 +15,4 @@ public enum PedidoStatus {
     public String getStatus() {
         return status;
     }
-
 }

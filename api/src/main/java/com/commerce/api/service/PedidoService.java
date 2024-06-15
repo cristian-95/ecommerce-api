@@ -9,10 +9,7 @@ import com.commerce.api.repository.PedidoRepository;
 import com.commerce.api.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,23 +44,10 @@ public class PedidoService {
         return pedidos;
     }
 
-    public Pedido getPedido(String username) {
-        if (clienteService.getProfile(username) != null) {
-            Cliente cliente = clienteService.getProfile(username);
-            return this.pedidoRepository.findByCliente(cliente);
-        } else {
-            Loja loja = lojaService.getProfile(username);
-            return this.pedidoRepository.findByLoja(loja);
-        }
-    }
-
     public Pedido getPedidoByCodigo(String codigo) {
         return pedidoRepository.findByCodigo(codigo);
     }
 
-    public Pedido getPedidoById(Long id) throws ResourceNotFoundException {
-        return this.pedidoRepository.findById(id).orElseThrow();
-    }
 
     public List<Pedido> processarPedidos(String username) throws ResourceNotFoundException {
 
@@ -101,9 +85,11 @@ public class PedidoService {
     public void deletePedido(String username, RequestDTO requestDTO) {
         try {
             Loja loja = lojaService.getProfile(username);
-            Pedido pedido = this.pedidoRepository.findById(requestDTO.id()).get();
-            if (loja.equals(pedido.getLoja()))
-                this.pedidoRepository.delete(pedido);
+            var pedidoOptional = this.pedidoRepository.findById(requestDTO.id());
+            if (pedidoOptional.isPresent()) {
+                Pedido pedido = pedidoOptional.get();
+                if (loja.equals(pedido.getLoja())) this.pedidoRepository.delete(pedido);
+            }
         } catch (Exception e) {
             throw new ResourceNotFoundException("Pedido (id = %d) não encontrado".formatted(requestDTO.id()));
         }
@@ -121,16 +107,19 @@ public class PedidoService {
         this.pedidoRepository.save(pedido);
         List<Item> itens = pedido.getItens();
         itens.forEach(i -> {
-            Item item = itemRepository.findById(i.getId()).get();
-            item.setPedido(pedido);
+            Optional<Item> itemOptional = itemRepository.findById(i.getId());
+            if (itemOptional.isPresent()) {
+                Item item = itemOptional.get();
+                item.setPedido(pedido);
 
-            Produto produto = item.getProduto();
-            Integer estoque = produto.getQtdeEstoque();
-            estoque -= item.getQuantidade();
-            produto.setQtdeEstoque(estoque);
+                Produto produto = item.getProduto();
+                Integer estoque = produto.getQtdeEstoque();
+                estoque -= item.getQuantidade();
+                produto.setQtdeEstoque(estoque);
 
-            produtoRepository.save(produto);
-            itemRepository.save(item);
+                produtoRepository.save(produto);
+                itemRepository.save(item);
+            }
         });
 
         this.lojaService.save(loja);

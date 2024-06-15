@@ -12,7 +12,6 @@ import org.hibernate.validator.constraints.br.CNPJ;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "lojas")
@@ -106,16 +105,4 @@ public class Loja extends Usuario {
         this.descricao = descricao;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Loja loja)) return false;
-        if (!super.equals(o)) return false;
-        return Objects.equals(CNPJ, loja.CNPJ);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), CNPJ);
-    }
 }

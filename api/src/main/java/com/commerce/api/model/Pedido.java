@@ -64,7 +64,7 @@ public class Pedido implements Serializable {
     }
 
     public Double atualizarTotal() {
-        Double res = 0.0;
+        double res = 0.0;
         for (Item i : itens) {
             res += i.getProduto().getPreco() * i.getQuantidade();
         }

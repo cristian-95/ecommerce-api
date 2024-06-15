@@ -14,7 +14,6 @@ public record ClienteUpdateDTO(
         String username,
         @Email(message = "E-mail em formato inválido.")
         String email,
-        @Column(nullable = true)
         @Telefone
         String telefone,
         String endereco,

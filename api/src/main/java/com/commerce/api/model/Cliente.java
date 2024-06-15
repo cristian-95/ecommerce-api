@@ -57,10 +57,9 @@ public class Cliente extends Usuario {
 
     public Cliente(String username, String encriptedPassword, String role) {
         super(username, encriptedPassword, role);
-        //List<Foo> list = new ArrayList<Foo>(Arrays.asList(array));
-        this.favoritos = new ArrayList<Produto>();
-        this.pedidos = new ArrayList<Pedido>();
-        this.carrinhoDeCompras = new ArrayList<CarrinhoDeCompras>();
+        this.favoritos = new ArrayList<>();
+        this.pedidos = new ArrayList<>();
+        this.carrinhoDeCompras = new ArrayList<>();
     }
 
     public Cliente(String username, String email, String password, String nome, String telefone, String endereco,
@@ -70,9 +69,9 @@ public class Cliente extends Usuario {
         cpf = cPF;
         this.dataNasc = dataNasc;
         this.genero = genero;
-        this.favoritos = new ArrayList<Produto>();
-        this.pedidos = new ArrayList<Pedido>();
-        this.carrinhoDeCompras = new ArrayList<CarrinhoDeCompras>();
+        this.favoritos = new ArrayList<>();
+        this.pedidos = new ArrayList<>();
+        this.carrinhoDeCompras = new ArrayList<>();
     }
 
     public Cliente(String username, String email, String password, String nome, String telefone, String endereco,
@@ -158,65 +157,4 @@ public class Cliente extends Usuario {
         this.pedidos = pedidos;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((sobrenome == null) ? 0 : sobrenome.hashCode());
-        result = prime * result + ((cpf == null) ? 0 : cpf.hashCode());
-        result = prime * result + ((dataNasc == null) ? 0 : dataNasc.hashCode());
-        result = prime * result + ((genero == null) ? 0 : genero.hashCode());
-        result = prime * result + ((favoritos == null) ? 0 : favoritos.hashCode());
-        result = prime * result + ((carrinhoDeCompras == null) ? 0 : carrinhoDeCompras.hashCode());
-        result = prime * result + ((pedidos == null) ? 0 : pedidos.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Cliente other = (Cliente) obj;
-        if (sobrenome == null) {
-            if (other.sobrenome != null)
-                return false;
-        } else if (!sobrenome.equals(other.sobrenome))
-            return false;
-        if (cpf == null) {
-            if (other.cpf != null)
-                return false;
-        } else if (!cpf.equals(other.cpf))
-            return false;
-        if (dataNasc == null) {
-            if (other.dataNasc != null)
-                return false;
-        } else if (!dataNasc.equals(other.dataNasc))
-            return false;
-        if (genero == null) {
-            if (other.genero != null)
-                return false;
-        } else if (!genero.equals(other.genero))
-            return false;
-        if (favoritos == null) {
-            if (other.favoritos != null)
-                return false;
-        } else if (!favoritos.equals(other.favoritos))
-            return false;
-        if (carrinhoDeCompras == null) {
-            if (other.carrinhoDeCompras != null)
-                return false;
-        } else if (!carrinhoDeCompras.equals(other.carrinhoDeCompras))
-            return false;
-        if (pedidos == null) {
-            return other.pedidos == null;
-        } else return pedidos.equals(other.pedidos);
-    }
-
-    public void novoCarrinho() {
-        this.carrinhoDeCompras.add(0, new CarrinhoDeCompras(this));
-    }
 }

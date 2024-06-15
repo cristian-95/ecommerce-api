@@ -1,7 +1,10 @@
 package com.commerce.api.model;
 
 import com.commerce.api.model.dto.ProdutoDTO;
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -15,7 +18,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "produtos")
-@JsonPropertyOrder({"id", "nome", "descricao", "preco", "specs", "qtdeEstoque","imagens"})
+@JsonPropertyOrder({"id", "nome", "descricao", "preco", "specs", "qtdeEstoque", "imagens"})
 @Relation(collectionRelation = "produtos")
 public class Produto extends RepresentationModel<Produto> implements Serializable {
 
@@ -149,6 +152,15 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
         return imagens;
     }
 
+
+    public List<Item> getItens() {
+        return itens;
+    }
+
+    public void setItens(List<Item> itens) {
+        this.itens = itens;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -201,18 +213,4 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
         } else return qtdeEstoque.equals(other.qtdeEstoque);
     }
 
-    @Override
-    public String toString() {
-        return "Produto{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", descricao='" + descricao + '\'' +
-                ", specs=" + specs +
-                ", preco=" + preco +
-                ", qtdeEstoque=" + qtdeEstoque +
-                ", clientes=" + clientes +
-                ", itens=" + itens +
-                ", loja=" + loja +
-                '}';
-    }
 }

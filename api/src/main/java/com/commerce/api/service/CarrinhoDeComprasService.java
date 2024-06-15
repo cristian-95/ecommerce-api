@@ -35,30 +35,11 @@ public class CarrinhoDeComprasService {
         return carrinhoDeCompras;
     }
 
-    public CarrinhoDeCompras adicionarItem(Long carrinhoId, Long produtoId)
-            throws ResourceNotFoundException {
-        CarrinhoDeCompras carrinhoDeCompras = getCarrinhoDeComprasById(carrinhoId);
-        Produto produto = produtoService.getProdutoById(produtoId);
-        Item savedItem = carrinhoDeCompras.adicionarItem(produto);
-        itemRepository.save(savedItem);
-        return carrinhoDeComprasRepository.save(carrinhoDeCompras);
-    }
-
     public CarrinhoDeCompras adicionarItem(CarrinhoDeCompras carrinhoDeCompras, Long produtoId)
             throws ResourceNotFoundException {
         Produto produto = produtoService.getProdutoById(produtoId);
         Item savedItem = carrinhoDeCompras.adicionarItem(produto);
         itemRepository.save(savedItem);
-        return carrinhoDeComprasRepository.save(carrinhoDeCompras);
-    }
-
-    public CarrinhoDeCompras removerItem(Long carrinhoId, Long produtoId)
-            throws ResourceNotFoundException {
-        CarrinhoDeCompras carrinhoDeCompras = getCarrinhoDeComprasById(carrinhoId);
-        if (carrinhoDeCompras.containsProduto(produtoId)) {
-            Item item = carrinhoDeCompras.getItemByProdutoId(produtoId);
-            itemRepository.delete(item);
-        }
         return carrinhoDeComprasRepository.save(carrinhoDeCompras);
     }
 
@@ -70,10 +51,6 @@ public class CarrinhoDeComprasService {
             itemRepository.delete(item);
         }
         return carrinhoDeComprasRepository.save(carrinhoDeCompras);
-    }
-
-    public void remover(CarrinhoDeCompras carrinhoDeCompras) {
-        this.carrinhoDeComprasRepository.delete(carrinhoDeCompras);
     }
 
     CarrinhoDeCompras create(CarrinhoDeCompras carrinhoDeCompras) {
