@@ -47,7 +47,7 @@ public class CarrinhoDeCompras {
 
     public CarrinhoDeCompras(Long id, List<Item> itens, Pedido pedido, Double total, Cliente cliente) {
         this.id = id;
-        this.itens = itens;
+        this.itens = initializeItens(itens);
         this.total = total;
         this.cliente = cliente;
     }
@@ -105,22 +105,6 @@ public class CarrinhoDeCompras {
             }
         }
         return false;
-    }
-
-    public boolean removerItem(Item item) {
-        boolean flag = false;
-        if (itens.contains(item)) {
-            flag = itens.get(itens.indexOf(item)).removerProduto();
-            this.atualizarTotal();
-        } else {
-            System.out.println("Produto " + item.getProduto().getNome() + " não consta entre os itens.");
-        }
-        return flag;
-    }
-
-    public void limparCarrinho() {
-        this.itens.clear();
-        atualizarTotal();
     }
 
     public Long getId() {

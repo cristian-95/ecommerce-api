@@ -18,16 +18,15 @@ public class SpringDocConfig {
                         .description("""
                                     API RESTful para o gerenciamento de uma plataforma de e-commerce.
                                     
-                                    Curso: Bacharelado em Ciência da Computação
-                                    Disciplina: Desenvolvimento para Web
+                                    Curso: Bacharelado em Ciências da Computação - noturno
+                                    Disciplina: Desenvolvimento de Software para Web
                                     Professor: Davi Duarte de Paula
                                     
                                     Grupo:
                                     Cristian Santos de Castro
                                     Edu Teodoro Batista
                                     José Zumbini Neto
-                                    Sergio Paulo Guerrato Alves
-                                     
+                                    Sergio Paulo Guerrato Alves                                     
                                 """)
                         .license(
                                 new License()

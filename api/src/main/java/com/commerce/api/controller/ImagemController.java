@@ -29,24 +29,24 @@ public class ImagemController {
         this.tokenService = tokenService;
     }
 
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Adiciona uma imagem a um produto", tags = {"Produtos"})
     public ResponseEntity<List<Imagem>> addImagem(
             @RequestHeader("Authorization") String token,
             @PathVariable Long produtoId,
-            @RequestPart("file") MultipartFile[] files) {
+            @RequestPart("files") MultipartFile[] files) {
         String username = tokenService.getUsernameFromToken(token);
         List<Imagem> imagens = imagemService.adicionarImagens(username, produtoId, files);
         return new ResponseEntity<>(imagens, HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Recupera imagens por produto", tags = {"Produtos"})
     public ResponseEntity<List<Imagem>> getImagensByProduto(@PathVariable Long produtoId, HttpServletRequest request) {
         return ResponseEntity.ok(imagemService.getImagensByProduto(produtoId, request));
     }
 
-    @GetMapping("/{imagemId}")
+    @GetMapping(value = "/{imagemId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Recupera imagem por id", tags = {"Produtos"})
     public ResponseEntity<Imagem> getImagemById(@PathVariable Long produtoId, @PathVariable Long imagemId) {
         Imagem imagem = imagemService.getImagemById(produtoId, imagemId);

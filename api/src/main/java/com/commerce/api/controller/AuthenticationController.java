@@ -46,15 +46,7 @@ public class AuthenticationController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Entrar na conta", description = "Autenticação de usuários.", tags = {
-            "Autenticação"}, responses = {
-            @ApiResponse(description = "Sucess", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = LoginResponseDTO.class)))),
-            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
-            @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
-            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-            @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-    })
+    @Operation(summary = "Entrar na conta", tags = {"Autenticação"})
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
         try {
@@ -69,14 +61,7 @@ public class AuthenticationController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Criar conta", description = "Cria uma conta.", tags = {
-            "Autenticação"}, responses = {
-            @ApiResponse(description = "Sucess", responseCode = "200", content = @Content),
-            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
-            @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
-            @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-    })
+    @Operation(summary = "Criar conta", tags = {"Autenticação"})
     public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
         Usuario user;
         String encryptedPassword;
