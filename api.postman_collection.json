@@ -1143,7 +1143,7 @@
 							"variable": [
 								{
 									"key": "produtoId",
-									"value": "<long>",
+									"value": "",
 									"description": "(Required) "
 								}
 							]
@@ -1206,14 +1206,14 @@
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"file\": \"<string>\"\n}",
-							"options": {
-								"raw": {
-									"headerFamily": "json",
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files",
+									"type": "file",
+									"src": "/home/cristian/Imagens/postman/bobesponja.png"
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{baseUrl}}/produtos/:produtoId/imagens",
@@ -1228,7 +1228,7 @@
 							"variable": [
 								{
 									"key": "produtoId",
-									"value": "<long>",
+									"value": "",
 									"description": "(Required) "
 								}
 							]
@@ -1393,12 +1393,12 @@
 							"variable": [
 								{
 									"key": "produtoId",
-									"value": "<long>",
+									"value": "",
 									"description": "(Required) "
 								},
 								{
 									"key": "imagemId",
-									"value": "<long>",
+									"value": "",
 									"description": "(Required) "
 								}
 							]
@@ -1867,7 +1867,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"moveis_cia\",\n  \"password\": \"123\"\n}",
+							"raw": "{\n  \"username\": \"username\",\n  \"password\": \"123\"\n}",
 							"options": {
 								"raw": {
 									"headerFamily": "json",
