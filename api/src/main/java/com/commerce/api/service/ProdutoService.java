@@ -21,6 +21,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +56,7 @@ public class ProdutoService {
         }
         produtos.forEach(p -> {
             p.add(linkTo(methodOn(ProdutoController.class).getById(p.getId())).withSelfRel());
-            p.getImagens().forEach( i-> i.add(linkTo(methodOn(ImagemController.class).downloadImagem(p.getId(), i.getId(),request)).withRel("download")));
+            p.getImagens().forEach(i -> i.add(linkTo(methodOn(ImagemController.class).downloadImagem(p.getId(), i.getId(), request)).withRel("download")));
 
         });
         return assembler.toModel(produtos);
@@ -112,8 +113,19 @@ public class ProdutoService {
 
     public void deleteProduto(String username, RequestDTO requestDTO) {
         if (verificarPermissao(username, requestDTO.id())) {
-            Produto produto = produtoRepository.findById(requestDTO.id()).get();
-            produtoRepository.delete(produto);
+            Optional<Produto> optionalProduto = produtoRepository.findById(requestDTO.id());
+            if (optionalProduto.isPresent()){
+                Produto produto = optionalProduto.get();
+                produto.getImagens().forEach(imagem -> {
+                    try {
+                        imagemService.deleteImagem(username, produto.getId(), imagem.getId() );
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                produtoRepository.delete(produto);
+            }
+
         }
     }
 
@@ -138,7 +150,7 @@ public class ProdutoService {
     }
 
     private boolean verificarPermissao(String username, Long produtoId) {
-        if (!adminService.isAdmin(username) || !lojaRepository.existsByUsername(username)) return false;
+        if (!adminService.isAdmin(username) && !lojaRepository.existsByUsername(username)) return false;
         Loja loja = lojaRepository.findByUsername(username);
         Produto produto = this.produtoRepository.findById(produtoId).orElseThrow();
         return produto.getLoja().equals(loja);

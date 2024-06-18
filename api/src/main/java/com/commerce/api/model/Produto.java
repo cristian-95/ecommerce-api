@@ -40,7 +40,7 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
     private List<Cliente> clientes;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "produto", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Item> itens;
 
     @JsonIncludeProperties({"id", "nome"})
@@ -49,7 +49,7 @@ public class Produto extends RepresentationModel<Produto> implements Serializabl
     private Loja loja;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private final List<Imagem> imagens;
 
     public Produto() {

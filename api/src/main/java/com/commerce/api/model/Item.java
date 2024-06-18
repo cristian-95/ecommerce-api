@@ -32,6 +32,9 @@ public class Item {
     @JoinColumn(name = "pedido_id")
     private Pedido pedido;
 
+    public Item() {
+    }
+
     public Item(CarrinhoDeCompras carrinhoDeCompras, Produto produto) {
         this.carrinhoDeCompras = carrinhoDeCompras;
         this.produto = produto;
